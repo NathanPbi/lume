@@ -153,7 +153,7 @@ dialog::backdrop{background:#2a101c88}.chips{display:flex;flex-wrap:wrap;gap:6px
 #tryon{width:min(1100px,calc(100vw - 16px));max-height:calc(100dvh - 16px)}
 .tgrid{display:grid;gap:14px;padding:0 18px 18px}
 @media(min-width:900px){.tgrid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:start}}
-@media (max-width:760px){#tryon .stage:has(#empty.hidden){position:sticky;top:0;z-index:6;min-height:0;box-shadow:0 8px 18px -10px #2a101c66}#tryon .stage:has(#empty.hidden) canvas.photo{max-height:38vh}}
+@media (max-width:760px){#tryon .stage:has(#empty.hidden){position:sticky;top:0;z-index:6;min-height:0;box-shadow:0 8px 18px -10px #2a101c66}#tryon .stage:has(#empty.hidden) canvas.photo{max-height:64vh;width:100%;height:auto;object-fit:contain}}
 .zbar{position:absolute;right:10px;bottom:10px;display:flex;align-items:center;gap:2px;background:#fffffff0;color:#3d1c2e;border-radius:999px;padding:4px;box-shadow:0 4px 14px #2a101c33;z-index:3}
 .zbar button{border:0;background:transparent;color:inherit;min-width:36px;height:36px;border-radius:999px;font:600 20px/1 inherit;cursor:pointer}.zbar button:hover{background:#f3e3e8}.zbar .zfit{font-size:13px;padding:0 10px}.zbar .zfit:disabled{display:none}@media(max-width:760px){.zbar{right:6px;bottom:6px;padding:2px}.zbar button{min-width:32px;height:32px;font-size:18px}.zbar span{min-width:40px;font-size:12px}}
 .zbar span{min-width:46px;text-align:center;font-size:13px;font-weight:600}
@@ -229,7 +229,7 @@ dialog::backdrop{background:#2a101c88}.chips{display:flex;flex-wrap:wrap;gap:6px
 #camDlg .chint.ok{background:#1f7a4ce8}#camDlg .chint.near{background:#8a5a10e6}
 #camDlg .cdown{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:86px;height:86px;border-radius:50%;background:#1f7a4ccc;color:#fff;font:700 40px/86px inherit;text-align:center;box-shadow:0 0 0 6px #ffffff44}
 .stage{background:var(--rose);border-radius:16px;min-height:320px;display:grid;place-items:center;position:relative;overflow:hidden}
-.stage canvas.photo{display:block;max-width:100%;max-height:58vh;width:auto;height:auto;touch-action:none}
+.stage canvas.photo{display:block;max-width:100%;max-height:68vh;width:auto;height:auto;touch-action:none}
 .empty{text-align:center;padding:22px 16px;display:grid;justify-items:center;gap:8px;max-width:420px}
 .empty img{width:150px;height:auto;border-radius:12px;opacity:.9}
 .steps{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
@@ -388,12 +388,12 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-cam11</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-big12</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
       <div class="pick hidden" id="fchips" style="margin-top:8px"></div>
-      <div class="under" style="margin-top:8px"><span id="exp">As fotos ficam só no seu aparelho e somem em 24h. <span style="opacity:.7">Detecção de unhas: modelo nails_seg_yolov8 de mnemic (CC BY 4.0).</span></span><span class="sp"></span>
+      <div class="under" id="underBox" style="margin-top:8px"><span id="exp">As fotos ficam só no seu aparelho e somem em 24h. <span style="opacity:.7">Detecção de unhas: modelo nails_seg_yolov8 de mnemic (CC BY 4.0).</span></span><span class="sp"></span>
         <span id="swap" class="hidden"><label class="link"><input type="file" accept="image/*" capture="environment" class="pf2" hidden>Tirar outra</label><label class="link"><input type="file" accept="image/*" class="pf2" hidden>Trocar foto</label></span>
         <label class="link" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer"><button class="toggle" role="switch" id="bgTog" aria-label="Fundo neutro"></button>Fundo neutro</label><label class="link" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer"><button class="toggle" role="switch" id="alTog" aria-label="Alinhar ao modelo"></button>Alinhar ao modelo</label><button class="link" id="wipe">Apagar fotos</button><button class="wine hidden" id="nextBtn" style="min-height:40px">Agora a mão direita →</button>
       </div>
@@ -404,6 +404,7 @@ input[type=range]{width:100%;accent-color:#65243b}
       <div class="box" id="fakeBox"><h4>Tipo de unha</h4><div class="chips" id="fakeTog" role="group" aria-label="Tipo de unha"><button data-t="nat">Minha unha natural</button><button data-t="fake">Postiça / alongamento</button></div><div id="fakeOpts" class="hidden"><p class="muted" style="margin:10px 0 6px;font-size:13px">Formato</p><div class="chips" id="shapeChips"></div><p class="muted" style="margin:10px 0 6px;font-size:13px">Comprimento</p><div class="chips" id="lenChips"></div></div></div>
       <div class="box brushbox"><div class="ptarget" id="ptarget" aria-live="polite"></div><div style="display:flex;gap:12px;align-items:center"><span id="brushIco" aria-hidden="true"></span><p class="fingerline" id="fingerLine" style="margin:0">Escolha a cor e toque na unha: o pincel passa o esmalte nela.</p></div>
         <button class="ghost hidden" id="paintAll" style="width:100%;margin-top:10px">Pintar todas as unhas com esta cor</button></div>
+      <div class="box hidden" id="photoOpts"><h4>Opções da foto</h4></div>
       <details class="box" id="adj"><summary>Ajustar marcação das unhas</summary>
         <p class="muted" style="margin:4px 0 8px">Ligue o ajuste e toque numa unha: arraste as bolinhas da cutícula, das laterais e da ponta até a borda real. Arraste o meio para mover. Toque num espaço vazio para marcar uma unha que faltou.</p>
         <div class="pick" style="justify-content:flex-start"><button class="ghost" id="editBtn">Ligar ajuste</button><button class="ghost hidden" id="delBtn">Remover</button></div>
@@ -766,20 +767,26 @@ function outline(c,n,sel,lw,label){const P=n.poly||makeCP(n);c.save();c.beginPat
  if(S.edit&&n.cp){n.cp.forEach(([x,y],k)=>{c.beginPath();c.arc(x,y,lw*(CPLBL[k]?3.4:2.6),0,7);c.fillStyle=sel?'#fff':'#ffffffb0';c.fill();c.lineWidth=lw*.8;c.strokeStyle='#65243b';c.stroke();
   if(sel&&CPLBL[k]&&(k===3||k===9)){c.font=`600 ${lw*5.2}px "DM Sans",sans-serif`;c.fillStyle='#fff';c.strokeStyle='#391a29';c.lineWidth=lw*1.2;const dx=x-n.cx,dy=y-n.cy,dl=Math.hypot(dx,dy)||1,tx=x+dx/dl*lw*9,ty=y+dy/dl*lw*9;c.textAlign='center';c.strokeText(CPLBL[k],tx,ty);c.fillText(CPLBL[k],tx,ty)}})}
  if(label&&!sel){c.fillStyle='#391a29c8';c.font=`600 ${lw*6}px "DM Sans",sans-serif`;c.textAlign='center';const ux=-Math.sin(n.ang),uy=Math.cos(n.ang);c.fillText(label,n.cx-ux*n.L*.95,n.cy-uy*n.L*.95)}c.restore()}
-function handCrop(h,o){const W=o.width,H=o.height;if(!h.lm||h.lm.length<21)return{ox:0,oy:0,cw:W,ch:H};
+function handCrop(h,o){const W=o.width,H=o.height;
+ if((!h.lm||h.lm.length<21)&&h.nails&&h.nails.length){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const ws=[];h.nails.forEach(n=>{const b=n.bb||[n.cx-n.W/2,n.cy-n.L/2,n.cx+n.W/2,n.cy+n.L/2];x0=Math.min(x0,b[0]);y0=Math.min(y0,b[1]);x1=Math.max(x1,b[2]);y1=Math.max(y1,b[3]);ws.push(b[2]-b[0])});
+  ws.sort((a,b)=>a-b);const m=ws[ws.length>>1];x0=Math.max(0,x0-m*.9);x1=Math.min(W,x1+m*.9);y0=Math.max(0,y0-m*.8);y1=Math.min(H,y1+m*1.3);
+  return{ox:Math.floor(x0),oy:Math.floor(y0),cw:Math.ceil(x1-x0),ch:Math.ceil(y1-y0)}}
+ if(!h.lm||h.lm.length<21)return{ox:0,oy:0,cw:W,ch:H};
  const P=h.lm.map(p=>[p.x*W,p.y*H]);let x0=1e9,x1=-1e9,y0=1e9;P.forEach(([x,y])=>{x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y)});
  (h.nails||[]).forEach(n=>{if(n.bb){x0=Math.min(x0,n.bb[0]);x1=Math.max(x1,n.bb[2]);y0=Math.min(y0,n.bb[1])}});
- const mcp=Math.max(P[5][1],P[9][1],P[13][1],P[17][1],P[2][1]),span=Math.max(40,mcp-y0);let y1=mcp+span*.42;
- const px=(x1-x0)*.07,py=span*.10;x0-=px;x1+=px;y0-=py;
- if((x1-x0)/(y1-y0)>1.25){const need=(x1-x0)/1.25-(y1-y0);y1+=need}// não deixa a faixa baixa demais
+ const mcp=Math.max(P[5][1],P[9][1],P[13][1],P[17][1],P[2][1]),span=Math.max(40,mcp-y0);let y1=mcp+span*.16;
+ const px=(x1-x0)*.04,py=span*.06;x0-=px;x1+=px;y0-=py;
+ if((x1-x0)/(y1-y0)>1.7){const need=(x1-x0)/1.7-(y1-y0);y1+=need}// não deixa a faixa baixa demais
  x0=Math.max(0,x0);y0=Math.max(0,y0);x1=Math.min(W,x1);y1=Math.min(H,y1);if(x1-x0<W*.25||y1-y0<H*.2)return{ox:0,oy:0,cw:W,ch:H};
  return{ox:Math.floor(x0),oy:Math.floor(y0),cw:Math.ceil(x1-x0),ch:Math.ceil(y1-y0)}}
 function drawT(){
  if(S.view==='B'){const ks=['L','R'].filter(k=>S.hands[k]),os=ks.map(k=>{styleHand(k);return renderHand(S.hands[k])});if(!os.length)return;
-  const cr=ks.map((k,j)=>handCrop(S.hands[k],os[j])),H=Math.min(...cr.map(q=>q.ch)),gap=os.length>1?Math.round(H*.025):0;let x=0;lay=[];
-  ks.forEach((k,j)=>{const s=H/cr[j].ch;lay.push({k,x,s,w:cr[j].cw*s,ox:cr[j].ox,oy:cr[j].oy});x+=cr[j].cw*s+gap});
-  cv.width=Math.round(x-gap);cv.height=H;const c=cv.getContext('2d');c.clearRect(0,0,cv.width,H);if(S.bgOn){c.fillStyle='#ebe3e5';c.fillRect(0,0,cv.width,H)}
-  lay.forEach((l,j)=>{c.drawImage(os[j],l.ox,l.oy,cr[j].cw,cr[j].ch,l.x,0,l.w,H);const n=S.sel&&S.sel.k===l.k&&selNail();if(n){c.save();c.beginPath();c.rect(l.x,0,l.w,H);c.clip();c.translate(l.x,0);c.scale(l.s,l.s);c.translate(-l.ox,-l.oy);outline(c,n,true,Math.max(2,cr[j].cw/300));c.restore()}});return}
+  const cr=ks.map((k,j)=>handCrop(S.hands[k],os[j]));lay=[];const vert=ks.length>1&&innerWidth<760;
+  if(vert){// celular: uma mão embaixo da outra, cada uma na largura toda
+   const Wc=Math.min(...cr.map(q=>q.cw)),gap=Math.round(Wc*.02);let y=0;ks.forEach((k,j)=>{const s=Wc/cr[j].cw;lay.push({k,x:0,y,s,w:Wc,h:cr[j].ch*s,ox:cr[j].ox,oy:cr[j].oy});y+=cr[j].ch*s+gap});cv.width=Wc;cv.height=Math.round(y-gap)}
+  else{const H=Math.min(...cr.map(q=>q.ch)),gap=ks.length>1?Math.round(H*.025):0;let x=0;ks.forEach((k,j)=>{const s=H/cr[j].ch;lay.push({k,x,y:0,s,w:cr[j].cw*s,h:H,ox:cr[j].ox,oy:cr[j].oy});x+=cr[j].cw*s+gap});cv.width=Math.round(x-gap);cv.height=H}
+  const c=cv.getContext('2d');c.clearRect(0,0,cv.width,cv.height);if(S.bgOn){c.fillStyle='#ebe3e5';c.fillRect(0,0,cv.width,cv.height)}
+  lay.forEach((l,j)=>{c.drawImage(os[j],l.ox,l.oy,cr[j].cw,cr[j].ch,l.x,l.y,l.w,l.h);const n=S.sel&&S.sel.k===l.k&&selNail();if(n){c.save();c.beginPath();c.rect(l.x,l.y,l.w,l.h);c.clip();c.translate(l.x,l.y);c.scale(l.s,l.s);c.translate(-l.ox,-l.oy);outline(c,n,true,Math.max(2,cr[j].cw/300));c.restore()}});return}
  const h=S.hands[S.view];if(!h)return;styleHand(S.view);const o=renderHand(h),q=S.edit?{ox:0,oy:0,cw:o.width,ch:o.height}:handCrop(h,o);cv.width=q.cw;cv.height=q.ch;lay=[{k:S.view,x:0,s:1,w:q.cw,ox:q.ox,oy:q.oy}];
  const c=cv.getContext('2d');c.drawImage(o,q.ox,q.oy,q.cw,q.ch,0,0,q.cw,q.ch);const lw=Math.max(2,q.cw/320);c.save();c.translate(-q.ox,-q.oy);
  if(S.edit)h.nails.forEach((n,i)=>outline(c,n,S.sel&&S.sel.k===S.view&&S.sel.i===i,lw,FING[n.f]));else{const n=S.sel&&S.sel.k===S.view&&selNail();if(n)outline(c,n,true,lw)}c.restore()}
@@ -831,14 +838,14 @@ function brushPaint(k,i){const h=S.hands[k],n=h&&h.nails[i];if(!n)return;const i
  const before=document.createElement('canvas');before.width=cv.width;before.height=cv.height;before.getContext('2d').drawImage(cv,0,0);
  look[idx].c=S.brushC;look[idx].a=S.brushA;saveLook();
  const after=document.createElement('canvas');after.width=cv.width;after.height=cv.height;after.getContext('2d').drawImage(cv,0,0);
- const l=lay.find(q=>q.k===k)||{x:0,s:1,ox:0,oy:0},cx=l.x+(n.cx-(l.ox||0))*l.s,cy=(n.cy-(l.oy||0))*l.s,L=n.L*l.s,W=n.W*l.s,hex=(byId(S.brushC)||{}).hex,c=cv.getContext('2d'),t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?1:650,id=++brushAnim;
+ const l=lay.find(q=>q.k===k)||{x:0,s:1,ox:0,oy:0},cx=l.x+(n.cx-(l.ox||0))*l.s,cy=(l.y||0)+(n.cy-(l.oy||0))*l.s,L=n.L*l.s,W=n.W*l.s,hex=(byId(S.brushC)||{}).hex,c=cv.getContext('2d'),t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?1:650,id=++brushAnim;
  const frame=now=>{if(id!==brushAnim)return;const t=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-t,2);
   c.drawImage(before,0,0);c.save();c.translate(cx,cy);c.rotate(n.ang);const y0=-L*.62,yy=y0+e*L*1.3;
   c.beginPath();c.rect(-W,y0,W*2,yy-y0);c.clip();c.rotate(-n.ang);c.translate(-cx,-cy);c.drawImage(after,0,0);c.restore();
   if(t<1){const fx=cx-Math.sin(n.ang)*(yy),fy=cy+Math.cos(n.ang)*(yy),wob=Math.sin(t*18)*W*.18;drawBrushAt(c,fx+Math.cos(n.ang)*wob,fy+Math.sin(n.ang)*wob,n.ang,Math.max(L*1.7,60),hex);requestAnimationFrame(frame)}else drawT()};
  requestAnimationFrame(frame)}
 let drag=null;
-function pt(e){const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*cv.height/r.height;const l=lay.find(l=>x>=l.x&&x<=l.x+l.w)||lay[0];return l?{k:l.k,x:(x-l.x)/l.s+(l.ox||0),y:y/l.s+(l.oy||0)}:null}
+function pt(e){const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*cv.height/r.height;const l=lay.find(l=>x>=l.x&&x<=l.x+l.w&&y>=(l.y||0)&&y<=(l.y||0)+(l.h||1e9))||lay[0];return l?{k:l.k,x:(x-l.x)/l.s+(l.ox||0),y:(y-(l.y||0))/l.s+(l.oy||0)}:null}
 function hit(h,p){for(let i=h.nails.length-1;i>=0;i--){const n=h.nails[i],dx=p.x-n.cx,dy=p.y-n.cy,c=Math.cos(-n.ang),s=Math.sin(-n.ang),lx=dx*c-dy*s,ly=dx*s+dy*c;if((lx/(n.W*.6))**2+(ly/(n.L*.6))**2<=1.4)return i}return-1}
 const tolPx=px=>{const r=cv.getBoundingClientRect();return px*cv.width/Math.max(1,r.width)/((lay[0]&&lay[0].s)||1)};
 cv.addEventListener('pointerdown',e=>{const p=pt(e);if(!p)return;const h=S.hands[p.k];if(!h)return;ensureCPonce(h);
@@ -886,6 +893,11 @@ document.addEventListener('pointerup',e=>{if(!S.sel||S.edit||!trDlg.open)return;
  if(t.closest&&t.closest('#cv,#tDots,#tArts,#ptarget,.zbar,#adj,#editCtl,#views'))return;S.sel=null;renderTarget();drawT()},true);
 setTimeout(()=>{try{renderTarget()}catch(_){}},0);
 document.querySelectorAll('#fakeTog [data-t]').forEach(b=>b.onclick=()=>{S.shape=b.dataset.t==='fake'?(S.lastFake||'amendoada'):'natural';try{localStorage.setItem('lume-shape2',S.shape)}catch(_){}renderShapeChips();reshapeAll()});setTimeout(()=>{try{renderShapeChips()}catch(_){}},0);
+
+/* celular: as opções da foto (fundo neutro, alinhar, trocar, apagar) vão para baixo, e a foto ganha o espaço */
+(function(){const mq=matchMedia('(max-width:760px)'),ub=$('#underBox'),home=ub&&ub.parentElement,next=ub&&ub.nextSibling,po=$('#photoOpts');
+ const place=()=>{if(!ub||!po)return;if(mq.matches){po.appendChild(ub);po.classList.remove('hidden');ub.style.marginTop='0'}else{home.insertBefore(ub,next);po.classList.add('hidden');ub.style.marginTop='8px'}};
+ place();mq.addEventListener?mq.addEventListener('change',place):mq.addListener(place);addEventListener('resize',()=>{try{drawT()}catch(_){}})})();
 $('#zIn').onclick=()=>zAt(1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zOut').onclick=()=>zAt(1/1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zReset').onclick=()=>zReset(true);
 const _drawT0=drawT;drawT=function(){_drawT0();try{zApply()}catch(_){}try{renderTarget()}catch(_){}};
 function ensureCPonce(h){if(h.nails.some(n=>!n.cp))ensureCP(h)}
