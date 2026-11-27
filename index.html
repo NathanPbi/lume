@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lume · Provador</title>
+<title>Nail Virtual · Provador</title>
+<link rel="icon" type="image/png" href="nv-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">
 <style>
@@ -26,6 +27,17 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 /* trilho */
 .rail{position:fixed;inset:0 auto 0 0;width:218px;background:linear-gradient(155deg,#3d1c2e,#371b2a 75%,#402032);color:#fff5f7;padding:30px 16px 18px;display:flex;flex-direction:column;z-index:30;transition:transform .25s}
 .brand{display:flex;align-items:center;gap:10px;padding-left:12px}
+.brand{padding-left:4px}.brand img{display:block}.brand .bimg{max-width:182px;max-height:92px;object-fit:contain}
+.brand .bmark{width:46px;height:46px;object-fit:contain;flex:none}.brand .bname{font:24px/1.05 "DM Serif Text",Georgia,serif;letter-spacing:-.3px;color:#fff5f7;word-break:break-word}
+.brand .plate{background:#fdf7f4;border-radius:14px;padding:8px;display:grid;place-items:center}
+.kicker{margin:10px 0 0 6px!important}
+.hbrand{display:none;align-items:center;gap:8px}.hbrand img{height:30px;width:auto;max-width:150px;object-fit:contain}
+@media(max-width:900px){.hbrand{display:flex}.crumb>span:not(.hbrand){display:none}}@media(max-width:520px){.crumb>b{display:none}}
+.brandEd{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:22px 0}
+.brandEd .prev{width:200px;min-height:110px;border-radius:14px;background:linear-gradient(155deg,#3d1c2e,#371b2a);display:grid;place-items:center;padding:12px}
+.brandEd .bRow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+@media(max-width:600px){.brandEd{grid-template-columns:1fr}.brandEd .prev{width:100%}}
+
 .brand svg{width:38px;height:40px;color:#f4c6cf}
 .brand span{font:italic 50px/.9 "DM Serif Text",Georgia,serif;letter-spacing:-3px}.brand i{color:#e7a2b4}
 .kicker{display:block;color:#d4b4c0;font-size:10px;letter-spacing:.3em;margin:8px 0 0 62px}
@@ -141,6 +153,7 @@ dialog::backdrop{background:#2a101c88}.chips{display:flex;flex-wrap:wrap;gap:6px
 #tryon{width:min(1100px,calc(100vw - 16px));max-height:calc(100dvh - 16px)}
 .tgrid{display:grid;gap:14px;padding:0 18px 18px}
 @media(min-width:900px){.tgrid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:start}}
+@media (max-width:760px){#tryon .stage:has(#empty.hidden){position:sticky;top:0;z-index:6;min-height:0;box-shadow:0 8px 18px -10px #2a101c66}#tryon .stage:has(#empty.hidden) canvas.photo{max-height:38vh}}
 .stage{background:var(--rose);border-radius:16px;min-height:320px;display:grid;place-items:center;position:relative;overflow:hidden}
 .stage canvas.photo{display:block;max-width:100%;max-height:58vh;width:auto;height:auto;touch-action:none}
 .empty{text-align:center;padding:22px 16px;display:grid;justify-items:center;gap:8px;max-width:420px}
@@ -189,8 +202,8 @@ input[type=range]{width:100%;accent-color:#65243b}
  <symbol id="i-flower" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5C10 6 10.5 3 12 3s2 3 0 6.5M14.5 12c3.5-2 6.5-1.5 6.5 0s-3 2-6.5 0M12 14.5c2 3.5 1.5 6.5 0 6.5s-2-3 0-6.5M9.5 12C6 14 3 13.5 3 12s3-2 6.5 0"/></symbol>
 </svg>
 <nav class="rail" id="rail" aria-label="Menu">
-  <div class="brand"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-width="1.65"><ellipse cx="24" cy="14" rx="5.4" ry="10.3"/><ellipse cx="24" cy="14" rx="5.4" ry="10.3" transform="rotate(60 24 24)"/><ellipse cx="24" cy="14" rx="5.4" ry="10.3" transform="rotate(120 24 24)"/><ellipse cx="24" cy="14" rx="5.4" ry="10.3" transform="rotate(180 24 24)"/><ellipse cx="24" cy="14" rx="5.4" ry="10.3" transform="rotate(240 24 24)"/><ellipse cx="24" cy="14" rx="5.4" ry="10.3" transform="rotate(300 24 24)"/></g></svg><span>lume<i>.</i></span></div>
-  <small class="kicker">NAIL STUDIO</small>
+  <div class="brand" id="brandBox"></div>
+  <small class="kicker" id="brandKick">PROVADOR DE UNHAS</small>
   <div class="navg" data-mode="cliente"><p>ATELIÊ</p>
     <button data-go="provador"><svg class="i"><use href="#i-spark"/></svg>Provador</button>
     <button data-go="agendamentos"><svg class="i"><use href="#i-cal"/></svg>Meus agendamentos</button>
@@ -207,7 +220,7 @@ input[type=range]{width:100%;accent-color:#65243b}
 <div class="mask" id="mask"></div>
 <main class="work">
   <header class="top">
-    <div class="crumb"><button class="menu" id="menuBtn" aria-label="Abrir menu"><svg class="i"><use href="#i-menu"/></svg></button><span>Meu estúdio</span><span aria-hidden="true">›</span><b id="crumbT">Provador</b></div>
+    <div class="crumb"><button class="menu" id="menuBtn" aria-label="Abrir menu"><svg class="i"><use href="#i-menu"/></svg></button><span class="hbrand" id="hBrand"></span><span>Meu estúdio</span><span aria-hidden="true">›</span><b id="crumbT">Provador</b></div>
     <label class="demo" style="display:flex;align-items:center;gap:6px">Ver como<select id="modeSel" aria-label="Ver como" style="border:0;background:transparent;font-weight:600;color:var(--wine);min-height:32px"><option value="cliente">Cliente</option><option value="pro">Profissional</option><option value="dono">Dono do app</option></select></label>
   </header>
   <div class="inner">
@@ -258,10 +271,12 @@ input[type=range]{width:100%;accent-color:#65243b}
     <!-- PAINEL -->
     <section id="pg-pro" class="page hidden">
       <span class="eyebrow">MEU ESTÚDIO</span>
-      <h1>Olá, Studio Lume</h1>
+      <h1 id="proHello">Olá, Studio Lume</h1>
       <div id="proGanhos"></div>
       <h2 class="serif" style="font-size:28px;margin:22px 0 10px">Próximos atendimentos</h2>
       <div id="proAgenda"></div>
+      <h2 class="serif" style="font-size:28px;margin:26px 0 0">Marca do studio</h2>
+      <div id="brandEd"></div>
     </section>
     <section id="pg-pro-catalogo" class="page hidden">
       <span class="eyebrow">MEU ESTÚDIO</span>
@@ -310,7 +325,7 @@ input[type=range]{width:100%;accent-color:#65243b}
     <div class="side">
       <div class="box"><h4>Esmalte</h4><div class="dots" id="tDots"></div></div>
       <div class="box"><h4>Nail art</h4><div class="arts" id="tArts"></div></div>
-      <div class="box brushbox"><div style="display:flex;gap:12px;align-items:center"><span id="brushIco" aria-hidden="true"></span><p class="fingerline" id="fingerLine" style="margin:0">Escolha a cor e toque numa unha: o pincel passa o esmalte nela.</p></div>
+      <div class="box brushbox"><div style="display:flex;gap:12px;align-items:center"><span id="brushIco" aria-hidden="true"></span><p class="fingerline" id="fingerLine" style="margin:0">A cor escolhida já vai para as unhas. Para pintar só uma, toque nela com o pincel.</p></div>
         <button class="ghost" id="paintAll" style="width:100%;margin-top:10px">Pintar todas as unhas com esta cor</button></div>
       <details class="box" id="adj"><summary>Ajustar marcação das unhas</summary>
         <p class="muted" style="margin:4px 0 8px">Ligue o ajuste e toque numa unha: arraste as bolinhas da cutícula, das laterais e da ponta até a borda real. Arraste o meio para mover. Toque num espaço vazio para marcar uma unha que faltou.</p>
@@ -423,7 +438,7 @@ function paintNail(out,src,n,i){
   const gloss=mLight*ext*((.06+.058*bright)*broad+(.135+.115*bright)*ridge),d=DIST[q]||.5,refl=inten*(gloss+.08*Math.pow(bright,1.7)+.075*Math.pow(glint,1.8))*Math.min(1,d/soft);
   const ed=Math.min(1,(d+.2)/soft),ea=ed*ed*(3-2*ed);let a=Math.min(M[p+3]/255,DIST[q]?ea:M[p+3]/255)*.976;if(n.design==='franc'&&!(D[p]>225&&D[p+1]>215&&D[p+2]>210))a*=.6;
   for(let c=0;c<3;c++){const pg=lin(D[p+c]/255),v=enc(Math.min(1,pg*shade*(1-refl)+refl));O.data[p+c]=S0[p+c]*(1-a)+v*a}}
- oc.putImageData(O,x0,y0)}
+ oc.putImageData(O,x0,y0);[m,d,rb,db,fb].forEach(c=>{try{if(c&&c.width){c.width=0;c.height=0}}catch(_){}})}
 function renderHand(h){if(!h)return null;const o=h.out||(h.out=document.createElement('canvas'));o.width=h.src.width;o.height=h.src.height;
  o.getContext('2d').drawImage(h.src,0,0);h.nails.forEach((n,i)=>{if(n.color)paintNail(o,h.src,n,i)});return o}
 
@@ -460,6 +475,7 @@ let D;
 try{D=JSON.parse(localStorage.getItem('lume-demo-v1')||'null')}catch(_){D=null}
 if(!D||!Array.isArray(D.items)||!D.settings)D=JSON.parse(JSON.stringify(SEED));
 const persist=()=>{try{localStorage.setItem('lume-demo-v1',JSON.stringify(D))}catch(_){}};
+setTimeout(()=>{try{renderBrand()}catch(e){console.warn('brand',e)}},0);
 const colors=()=>D.items.filter(i=>i.kind==='color'&&i.on),arts=()=>D.items.filter(i=>i.kind==='art'&&i.on);
 const byId=id=>D.items.find(i=>i.id===id);
 let look;try{look=JSON.parse(localStorage.getItem('lume-look')||'null')}catch(_){look=null}
@@ -571,7 +587,29 @@ $('#myBooks').onclick=e=>{const b=e.target.closest('[data-cancel]');if(!b)return
 /* ---------- painel da manicure ---------- */
 const inRange=(d,days)=>{const t=new Date(today()+'T12:00:00'),x=new Date(d+'T12:00:00');const diff=(t-x)/864e5;return days===0?diff===0:days==='m'?d.slice(0,7)===today().slice(0,7):diff>=0&&diff<days};
 let proPer='m';
-function renderProDash(){const done=D.bookings.filter(b=>b.status==='completed'&&inRange(b.date,proPer)),fat=done.reduce((s,b)=>s+b.price,0),tax=done.filter(b=>b.source==='app').length,net=fat-tax;
+
+/* ---------- marca: Nail Virtual por padrão; o studio pode usar a própria logo ---------- */
+function brandOf(){const b=(D.settings&&D.settings.brand)||{};return b.img?b:null}
+function renderBrand(){const b=brandOf(),nm=esc(D.settings.name||'Meu studio');let rail,head;
+ if(!b){rail=`<img class="bimg" src="nv-logo-light.png" alt="Nail Virtual">`;head=`<img src="nv-logo.webp" alt="Nail Virtual">`;$('#brandKick').textContent='PROVADOR DE UNHAS'}
+ else if(b.mode==='img'){rail=`<div class="plate"><img class="bimg" src="${b.img}" alt="${nm}"></div>`;head=`<img src="${b.img}" alt="${nm}">`;$('#brandKick').textContent='COM NAIL VIRTUAL'}
+ else{rail=`<div class="plate"><img class="bmark" src="${b.img}" alt=""></div><span class="bname">${nm}</span>`;head=`<img src="${b.img}" alt=""><b style="font:18px 'DM Serif Text',Georgia,serif;color:var(--wine)">${nm}</b>`;$('#brandKick').textContent='COM NAIL VIRTUAL'}
+ $('#brandBox').innerHTML=rail;$('#hBrand').innerHTML=head;const ph=$('#proHello');if(ph)ph.textContent='Olá, '+(D.settings.name||'Meu studio');
+ const sn=$('#studioName');if(sn)sn.textContent=D.settings.name||'Meu studio'}
+function renderBrandEd(){const el=$('#brandEd');if(!el)return;const b=(D.settings.brand)||{},has=!!b.img,mode=b.mode||'nome';
+ el.innerHTML=`<div class="brandEd"><div class="prev" id="brandPrev"></div><div>
+  <p style="margin:0">Use a logo do seu studio no app das suas clientes. Se não colocar nada, aparece a marca Nail Virtual.</p>
+  <label style="display:block;margin-top:12px;font-weight:600">Nome do studio<input id="brandName" value="${esc(D.settings.name||'')}" style="display:block;width:100%;max-width:340px;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font:inherit"></label>
+  <div class="bRow"><label class="wine" style="cursor:pointer;display:inline-flex;align-items:center;padding:10px 18px;border-radius:999px"><input type="file" accept="image/*" id="brandFile" hidden>${has?'Trocar logo':'Enviar logo'}</label>${has?'<button class="ghost" id="brandDel">Usar a marca Nail Virtual</button>':''}</div>
+  ${has?`<div class="chips" style="margin-top:12px" role="group" aria-label="Como mostrar"><button data-m="nome" aria-pressed="${mode!=='img'}">Logo + nome</button><button data-m="img" aria-pressed="${mode==='img'}">Só a imagem (já tem o nome)</button></div>`:''}
+ </div></div>`;
+ const pv=$('#brandPrev'),nm=esc(D.settings.name||'Meu studio');pv.innerHTML=!has?'<img src="nv-logo-light.png" alt="" style="max-width:170px;max-height:90px">':mode==='img'?`<div style="background:#fdf7f4;border-radius:12px;padding:8px"><img src="${b.img}" alt="" style="max-width:160px;max-height:80px;display:block"></div>`:`<div style="display:flex;align-items:center;gap:10px"><div style="background:#fdf7f4;border-radius:12px;padding:6px"><img src="${b.img}" alt="" style="width:42px;height:42px;object-fit:contain;display:block"></div><span style="font:20px 'DM Serif Text',Georgia,serif;color:#fff5f7">${nm}</span></div>`;
+ $('#brandName').onchange=e=>{D.settings.name=e.target.value.trim()||'Meu studio';persist();renderBrand();renderBrandEd()};
+ $('#brandFile').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+   D.settings.brand={img:c.toDataURL('image/png'),mode:(D.settings.brand&&D.settings.brand.mode)||'nome'};persist();renderBrand();renderBrandEd();toast('Logo do studio aplicada no app das clientes.')};im.src=r.result};r.readAsDataURL(f)};
+ const del=$('#brandDel');if(del)del.onclick=()=>{delete D.settings.brand;persist();renderBrand();renderBrandEd();toast('Voltou para a marca Nail Virtual.')};
+ el.querySelectorAll('[data-m]').forEach(bt=>bt.onclick=()=>{D.settings.brand.mode=bt.dataset.m;persist();renderBrand();renderBrandEd()})}
+function renderProDash(){try{renderBrandEd()}catch(_){};const done=D.bookings.filter(b=>b.status==='completed'&&inRange(b.date,proPer)),fat=done.reduce((s,b)=>s+b.price,0),tax=done.filter(b=>b.source==='app').length,net=fat-tax;
  const per={0:'hoje','7':'nos últimos 7 dias',m:'neste mês'}[proPer],up=D.bookings.filter(b=>b.status==='booked');
  $('#proGanhos').innerHTML=`<div class="bigearn"><small>Você ganhou ${per}</small><b>${brl(net)}</b><span>${done.length} atendimento${done.length===1?'':'s'} concluído${done.length===1?'':'s'} · faturamento ${brl(fat)} · taxa do app ${brl(tax)}</span>
  <div class="pers" role="group" aria-label="Período">${[['0','Hoje'],['7','7 dias'],['m','Mês']].map(([k,l])=>`<button data-p="${k}" aria-pressed="${String(proPer)===k}">${l}</button>`).join('')}</div></div>
@@ -662,8 +700,10 @@ function renderTSide(){if(!S.brushC||!byId(S.brushC))S.brushC=look[0].c;
  const hx=(byId(S.brushC)||{}).hex||'#c8788d';
  $('#tArts').innerHTML=`<button class="art" data-a="" aria-pressed="${!S.brushA}"><img alt="" src="${nailThumb(hx,'liso',44,60)}">Lisa</button>`+arts().map(a=>`<button class="art" data-a="${esc(a.id)}" aria-pressed="${a.id===S.brushA}"><img alt="" src="${nailThumb(hx,a.pat,44,60)}">${esc(a.name.split(' ')[0])}</button>`).join('');
  const nm=(byId(S.brushC)||{}).name||'';$('#fingerLine').textContent='Pincel com '+nm+(S.brushA?' + '+((byId(S.brushA)||{}).name||''):'')+'. Toque numa unha para pintar.';setCursor()}
-$('#tDots').onclick=e=>{const b=e.target.closest('[data-c]');if(b){S.brushC=b.dataset.c;renderTSide()}};
-$('#tArts').onclick=e=>{const b=e.target.closest('[data-a]');if(b){S.brushA=b.dataset.a||null;renderTSide()}};
+$('#tDots').onclick=e=>{const b=e.target.closest('[data-c]');if(b){S.brushC=b.dataset.c;applyPick();renderTSide()}};
+$('#tArts').onclick=e=>{const b=e.target.closest('[data-a]');if(b){S.brushA=b.dataset.a||null;applyPick();renderTSide()}};
+/* escolheu cor ou arte: aplica na hora. Vai para as 10 unhas; depois, tocar numa unha com o pincel pinta só ela. */
+function applyPick(){look.forEach(n=>{n.c=S.brushC;n.a=S.brushA});if((S.view==='L'||S.view==='R')&&!S.hands[S.view]){const o=S.view==='L'?'R':'L';if(S.hands[o]){S.view=o;S.sel=null;showT()}}saveLook()}
 const SHAPES={natural:'Natural',quadrada:'Quadrada',redonda:'Redonda',amendoada:'Amendoada',bailarina:'Bailarina',stiletto:'Stiletto'},LENS={curta:['Curta',.18],media:['Média',.55],longa:['Longa',1]};
 function renderShapeChips(){const sc=$('#shapeChips'),lc=$('#lenChips');if(!sc)return;sc.innerHTML=Object.entries(SHAPES).map(([k,v])=>`<button data-k="${k}" aria-pressed="${S.shape===k}">${v}</button>`).join('');
  lc.innerHTML=Object.entries(LENS).map(([k,v])=>`<button data-k="${k}" aria-pressed="${S.nlen===k}" ${S.shape==='natural'?'disabled':''}>${v[0]}</button>`).join('');
