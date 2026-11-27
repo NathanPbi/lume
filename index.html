@@ -380,7 +380,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-perto7</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-pose8</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -743,7 +743,8 @@ async function takePhoto(src,k){status('Preparando a foto…');
   let lm=await detect(toCanvas(im,960));let poseTip='';
   if(lm){h.lm=lm.map(p=>({x:p.x,y:p.y}));status('Recortando a mão (IA no aparelho)…');await new Promise(r=>setTimeout(r,30));try{h.mask=await handMaskMT(c,h.lm)}catch(_){h.mask=null}
   if(S.align&&typeof src!=='string'){const A=alignToTemplate(c,lm,k,h.mask);if(A){c=A.canvas;lm=A.lm;h.lm=lm.map(p=>({x:p.x,y:p.y}));h.mask=A.mask;poseTip=A.tip;Object.assign(h,{src:c,orig:c,jpg:c.toDataURL('image/jpeg',.88)})}}
-  const fwE=Math.hypot((lm[5].x-lm[9].x)*c.width,(lm[5].y-lm[9].y)*c.height)||20;try{h.bg=h.mask?composeNeutral(c,h.mask,fwE):neutralBg(c,h.lm)}catch(_){h.bg=null}try{h.maskURL=h.mask?h.mask.toDataURL('image/png'):null}catch(_){}h.src=S.bgOn&&h.bg?h.bg:c;h.nails=nailsFromLm(lm,c.width,c.height);status('Encontrando cada unha com IA…');h.yolo=await nailSeg(c,lm);if(h.yolo){status('Conferindo cada dedo…');h.yolo=await nailSegFill(c,h.nails,h.yolo)}status('Lendo o formato de cada unha…');await new Promise(r=>setTimeout(r,30));let fit=false;try{fit=fitFromMask(h)}catch(_){}if(!fit)try{anatomize(h)}catch(_){}if(!fit)h.nails.forEach(n=>delete n.cp);ensureCP(h);status(poseTip);if(poseTip)setTimeout(()=>status(''),6000)}else{status('Não achei a mão sozinho. Abra "Ajustar marcação" e toque em cada unha.');$('#adj').open=true;setEdit(true);setTimeout(()=>status(''),5000)}
+  const fwE=Math.hypot((lm[5].x-lm[9].x)*c.width,(lm[5].y-lm[9].y)*c.height)||20;try{h.bg=h.mask?composeNeutral(c,h.mask,fwE):neutralBg(c,h.lm)}catch(_){h.bg=null}try{h.maskURL=h.mask?h.mask.toDataURL('image/png'):null}catch(_){}h.src=S.bgOn&&h.bg?h.bg:c;h.nails=nailsFromLm(lm,c.width,c.height);status('Encontrando cada unha com IA…');h.yolo=await nailSeg(c,lm);if(h.yolo){status('Conferindo cada dedo…');h.yolo=await nailSegFill(c,h.nails,h.yolo)}status('Lendo o formato de cada unha…');await new Promise(r=>setTimeout(r,30));let fit=false;try{fit=fitFromMask(h)}catch(_){}if(!fit)try{anatomize(h)}catch(_){}if(!fit)h.nails.forEach(n=>delete n.cp);ensureCP(h);status(poseTip);if(poseTip)setTimeout(()=>status(''),6000)}else{status('Procurando as unhas direto na foto…');let ok=0;try{ok=await nailsWithoutHand(h,c)}catch(e){console.warn(e)}
+   if(ok){status('');}else{status('Não achei as unhas sozinho. Abra "Ajustar marcação" e toque em cada unha.');$('#adj').open=true;setEdit(true);setTimeout(()=>status(''),5000)}}
   save(k);showT();return h.nails.length}catch(e){status('Não consegui abrir essa foto. Tente outra.');setTimeout(()=>status(''),4000);return 0}}
 async function onPhoto(src,k){const n=await takePhoto(src,k);if(!n)return;
  if(k==='L'&&!S.hands.R)setTimeout(()=>{if(S.view==='L'&&!S.hands.R){S.view='R';showT()}},1300);else if(S.hands.L&&S.hands.R)setTimeout(()=>{S.view='B';showT()},900)}
@@ -1099,6 +1100,26 @@ async function nailSegFill(c,nails,dets){dets=dets||[];for(const n of nails){con
 function exposureIssue(c){try{const W=c.width,H=c.height,d=c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,W,H).data,N=W*H,st=Math.max(1,Math.floor(N/16000));let dk=0,wh=0,t=0;
  for(let i=0;i<N;i+=st){const j=i*4,l=.28*d[j]+.55*d[j+1]+.17*d[j+2];dk+=l<29;wh+=l>241;t++}
  if(dk>t*.94)return'A foto ficou muito escura. Aproxime a mão de uma janela e toque na tela para focar nas unhas.';if(wh>t*.96)return'A foto ficou clara demais para ver as bordas. Desligue o flash e use luz indireta.';return''}catch(_){return''}}
+
+/* mão em outras posições (dedos dobrados, palma, de lado): o detector de mão pode não achar a mão,
+   mas a IA de unhas acha as unhas direto na foto — então pintamos a partir delas */
+async function nailsWithoutHand(h,c){const W=c.width,H=c.height;let dets=await nailSegRect(c,0,0,W,H);if(!dets||!dets.length)return 0;
+ dets=dets.filter(d=>d.conf>=.3).sort((a,b)=>b.conf-a.conf).slice(0,5);
+ const info=dets.map(d=>{const pm=yoloMaskCanvas(d);let sx=0,sy=0,n=0,sxx=0,syy=0,sxy=0;for(let q=0;q<pm.a.length;q++)if(pm.a[q]>127){const X=pm.x0+q%pm.w,Y=pm.y0+Math.floor(q/pm.w);sx+=X;sy+=Y;n++}
+  const cx=sx/Math.max(1,n),cy=sy/Math.max(1,n);for(let q=0;q<pm.a.length;q++)if(pm.a[q]>127){const X=pm.x0+q%pm.w-cx,Y=pm.y0+Math.floor(q/pm.w)-cy;sxx+=X*X;syy+=Y*Y;sxy+=X*Y}
+  const th=.5*Math.atan2(2*sxy,sxx-syy),tr=sxx+syy,dt=sxx*syy-sxy*sxy,e1=tr/2+Math.sqrt(Math.max(0,tr*tr/4-dt)),e2=tr/2-Math.sqrt(Math.max(0,tr*tr/4-dt));let ux=Math.cos(th),uy=Math.sin(th);if(uy>0){ux=-ux;uy=-uy}// ponta da unha para cima
+  if(e1/Math.max(1,e2)<1.5||Math.abs(uy)<.5){ux=0;uy=-1}// unha vista de frente: comprimento é o eixo vertical
+  const bw=d.box[2]-d.box[0],bh=d.box[3]-d.box[1];return{d,cx,cy,ux,uy,area:n,L:Math.max(bw,bh),W:Math.min(bw,bh)}}).filter(o=>o.area>12);
+ if(!info.length)return 0;
+ // qual é o polegar: a unha mais baixa e maior, separada das outras
+ const ys=info.map(o=>o.cy).sort((a,b)=>a-b),medY=ys[ys.length>>1],medL=info.map(o=>o.L).sort((a,b)=>a-b)[info.length>>1];
+ const ars=info.map(o=>o.area).sort((a,b)=>a-b),medA=ars[ars.length>>1];let th=null;info.forEach(o=>{if(info.length>=4&&o.area>medA*1.3&&(!th||o.area>th.area))th=o});if(!th)info.forEach(o=>{if(o.cy>medY+medL*.9&&(!th||o.cy>th.cy))th=o});
+ const rest=info.filter(o=>o!==th).sort((a,b)=>a.cx-b.cx);
+ if(th&&rest.length&&th.cx>rest[rest.length-1].cx)rest.reverse();// polegar à direita: indicador é o mais à direita
+ else if(th&&rest.length&&Math.abs(th.cx-rest[0].cx)>Math.abs(th.cx-rest[rest.length-1].cx))rest.reverse();
+ const order=th?[th,...rest]:rest,fs=th?[0,1,2,3,4]:[1,2,3,4,0];
+ h.nails=order.map((o,i)=>({f:fs[i],cx:o.cx,cy:o.cy,L:o.L,W:o.W,ang:Math.atan2(o.uy,o.ux)-Math.PI/2}));
+ h.yolo=order.map(o=>o.d);h.noHand=1;const k=applyYolo(h);ensureCP(h);return k}
 function yoloMaskCanvas(d){const m=d.mask,b=d.box,gx=(b[2]-b[0])*.12,gy=(b[3]-b[1])*.12,bx=Math.floor(b[0]-gx),by=Math.floor(b[1]-gy),bw=Math.max(1,Math.ceil(b[2]+gx)-bx),bh=Math.max(1,Math.ceil(b[3]+gy)-by),a=new Uint8ClampedArray(bw*bh);
  const kx=m.w/(m.e[0]-m.o[0]),ky=m.h/(m.e[1]-m.o[1]),L=(i,j)=>m.a[Math.max(0,Math.min(m.h-1,j))*m.w+Math.max(0,Math.min(m.w-1,i))];
  for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const X=bx+x+.5,Y=by+y+.5;{const mx=(b[2]-b[0])*.1,my=(b[3]-b[1])*.1;if(X<b[0]-mx||X>b[2]+mx||Y<b[1]-my||Y>b[3]+my)continue}const u=(X-m.o[0])*kx-.5,v=(Y-m.o[1])*ky-.5,i=Math.floor(u),j=Math.floor(v),fu=u-i,fv=v-j;
