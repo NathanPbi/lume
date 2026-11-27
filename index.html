@@ -388,7 +388,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-big13</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-cor14</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -503,14 +503,14 @@ function paintNail(out,src,n,i){
  const fin=String(n.finish||'').toLowerCase(),matte=/fosc/.test(fin),pearl=/cinti|metal|brilh|glitter|perol/.test(fin),inten=(matte?.25:pearl?1.18:1)*(gl?1:.6);
  const lin=v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4),enc=v=>255*(v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055);
  let wSide=0,en=0;for(let q=0;q<N;q++){if(!IN[q]||TW[q]>.5)continue;const t=tOf(q),k=Math.min(SL-1,Math.floor(t*SL)),u=Math.max(-1,Math.min(1,(LX[q]-(smin[k]+smax[k])/2)/Math.max(.05,(smax[k]-smin[k])/2))),w=Math.pow(Math.max(0,PL[q]-mid),2)*Math.pow(Math.sin(Math.PI*t),2);wSide+=u*w;en+=w}
- const facing=en?Math.max(-.72,Math.min(.72,wSide/en*1.45)):(-.3),mLight=n.flat?.85:Math.max(.55,Math.min(1,(high-low)/32)),shortS=Math.min(n.W,n.L),soft=Math.max(1.35,Math.min(3.1,shortS*.032)),rad=Math.max(4,Math.round(shortS*.5));
+ const facing=en?Math.max(-.72,Math.min(.72,wSide/en*1.45)):(-.3),mLight=n.flat?.85:Math.max(.55,Math.min(1,(high-low)/32)),shortS=Math.min(n.W,n.L),soft=Math.max(1.35,Math.min(3.1,shortS*.032)),rad=Math.max(3,Math.round(shortS*.22));
  for(let q=0;q<N;q++){const p=q*4;if(!IN[q])continue;const x=q%bw,y=Math.floor(q/bw);
   const xa=Math.max(0,x-rad),ya=Math.max(0,y-rad),xb=Math.min(bw,x+rad+1),yb=Math.min(bh,y+rad+1),c4=CNT[yb*st+xb]-CNT[ya*st+xb]-CNT[yb*st+xa]+CNT[ya*st+xa];
   const l=PL[q],mean=c4?(SUM[yb*st+xb]-SUM[ya*st+xb]-SUM[yb*st+xa]+SUM[ya*st+xa])/c4:l;
   const light=Math.max(-.75,Math.min(1,(mean-mid)/range)),relief=(l-mean)/range,t=tOf(q),k=Math.min(SL-1,Math.floor(t*SL)),
    u=Math.max(-1,Math.min(1,(LX[q]-(smin[k]+smax[k])/2)/Math.max(.05,(smax[k]-smin[k])/2))),curve=Math.sqrt(Math.max(0,1-u*u));
-  const shade=Math.max(.6,Math.min(1.35,.97+.18*light+.05*relief))*(.66+.38*curve+.11*u*facing);
-  const fz=n.flat?1-TW[q]:1,bright=fz*.55*Math.max(0,Math.min(1,(mean-mid)/Math.max(18,(high-mid)*1.35))),glint=fz*Math.max(0,Math.min(1,(l-mean-5)/Math.max(16,range*.6)));
+  const shade=Math.max(.45,Math.min(1.6,.93+.45*light+.15*relief))*(.66+.38*curve+.11*u*facing);
+  const fz=n.flat?1-TW[q]:1,bright=fz*Math.max(0,Math.min(1,(l-mid)/Math.max(18,(high-mid)*1.35))),glint=fz*Math.max(0,Math.min(1,(l-mean-1)/Math.max(12,range*.46)));
   const off=u-(facing+.1*(t-.5)+.08*Math.sin(Math.PI*t)),broad=Math.exp(-.5*Math.pow(off/.34,2)),ridge=Math.exp(-.5*Math.pow(off/.105,2)),ext=Math.pow(Math.sin(Math.PI*t),.68);
   const gloss=mLight*ext*((.06+.058*bright)*broad+(.135+.115*bright)*ridge),d=DIST[q]||.5,refl=inten*(gloss+.08*Math.pow(bright,1.7)+.075*Math.pow(glint,1.8))*Math.min(1,d/soft);
   const ed=Math.min(1,(d+.2)/soft),ea=ed*ed*(3-2*ed);let a=Math.min(M[p+3]/255,DIST[q]?ea:M[p+3]/255)*.976;if(n.design==='franc'&&!(D[p]>225&&D[p+1]>215&&D[p+2]>210))a*=.6;
