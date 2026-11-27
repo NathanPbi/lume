@@ -216,7 +216,11 @@ dialog::backdrop{background:#2a101c88}.chips{display:flex;flex-wrap:wrap;gap:6px
  .toast{bottom:auto;top:calc(68px + env(safe-area-inset-top));max-width:min(88vw,360px);padding:9px 16px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .toast .i{flex:none}
 }
-@media(max-width:380px){.dh h2{font-size:19px!important}#views button{font-size:12px!important;padding:0 8px!important}.hero-c p{display:none}.grid .sample{flex-basis:88px!important}.grid .sample .pic{width:88px!important;height:88px!important}}
+@media(max-width:380px){.hero{min-height:300px!important}.dh h2{font-size:19px!important}#views button{font-size:12px!important;padding:0 8px!important}.hero-c p{display:none}.grid .sample{flex-basis:88px!important}.grid .sample .pic{width:88px!important;height:88px!important}}
+@media(max-width:760px){.hero{flex-direction:column;justify-content:flex-end;align-items:stretch}.hero{min-height:340px!important}.hero canvas{object-position:62% 4%!important}.hero .heroname{position:static!important;transform:none!important;align-self:flex-start;margin:-4px 18px 16px;font-size:12.5px;padding:5px 12px;background:#ffffffd9;box-shadow:0 2px 10px #3b182918}}
+.ptarget{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px;font-size:13px;color:var(--muted);line-height:1.35}.ptarget b{color:var(--ink);font-weight:600}
+.ptarget button{border:1px solid var(--wine);background:var(--wine);color:#fff;border-radius:999px;padding:6px 12px;font:600 12.5px/1 inherit;cursor:pointer}
+.stage:has(#empty.hidden){background:#ebe3e5}
 .stage{background:var(--rose);border-radius:16px;min-height:320px;display:grid;place-items:center;position:relative;overflow:hidden}
 .stage canvas.photo{display:block;max-width:100%;max-height:58vh;width:auto;height:auto;touch-action:none}
 .empty{text-align:center;padding:22px 16px;display:grid;justify-items:center;gap:8px;max-width:420px}
@@ -376,7 +380,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-resp4</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-perto6</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -389,8 +393,8 @@ input[type=range]{width:100%;accent-color:#65243b}
     <div class="side">
       <div class="box"><h4>Esmalte</h4><div class="dots" id="tDots"></div></div>
       <div class="box"><h4>Nail art</h4><div class="arts" id="tArts"></div></div>
-      <div class="box brushbox"><div class="pmode" id="pmode" role="group" aria-label="Como pintar"><span>Pintar</span><button data-m="todas" aria-pressed="true">Todas</button><button data-m="uma" aria-pressed="false">Uma por vez</button></div><div style="display:flex;gap:12px;align-items:center"><span id="brushIco" aria-hidden="true"></span><p class="fingerline" id="fingerLine" style="margin:0">Escolha a cor e toque na unha: o pincel passa o esmalte nela.</p></div>
-        <button class="ghost" id="paintAll" style="width:100%;margin-top:10px">Pintar todas as unhas com esta cor</button></div>
+      <div class="box brushbox"><div class="ptarget" id="ptarget" aria-live="polite"></div><div style="display:flex;gap:12px;align-items:center"><span id="brushIco" aria-hidden="true"></span><p class="fingerline" id="fingerLine" style="margin:0">Escolha a cor e toque na unha: o pincel passa o esmalte nela.</p></div>
+        <button class="ghost hidden" id="paintAll" style="width:100%;margin-top:10px">Pintar todas as unhas com esta cor</button></div>
       <details class="box" id="adj"><summary>Ajustar marcação das unhas</summary>
         <p class="muted" style="margin:4px 0 8px">Ligue o ajuste e toque numa unha: arraste as bolinhas da cutícula, das laterais e da ponta até a borda real. Arraste o meio para mover. Toque num espaço vazio para marcar uma unha que faltou.</p>
         <div class="pick" style="justify-content:flex-start"><button class="ghost" id="editBtn">Ligar ajuste</button><button class="ghost hidden" id="delBtn">Remover</button></div>
@@ -753,14 +757,23 @@ function outline(c,n,sel,lw,label){const P=n.poly||makeCP(n);c.save();c.beginPat
  if(S.edit&&n.cp){n.cp.forEach(([x,y],k)=>{c.beginPath();c.arc(x,y,lw*(CPLBL[k]?3.4:2.6),0,7);c.fillStyle=sel?'#fff':'#ffffffb0';c.fill();c.lineWidth=lw*.8;c.strokeStyle='#65243b';c.stroke();
   if(sel&&CPLBL[k]&&(k===3||k===9)){c.font=`600 ${lw*5.2}px "DM Sans",sans-serif`;c.fillStyle='#fff';c.strokeStyle='#391a29';c.lineWidth=lw*1.2;const dx=x-n.cx,dy=y-n.cy,dl=Math.hypot(dx,dy)||1,tx=x+dx/dl*lw*9,ty=y+dy/dl*lw*9;c.textAlign='center';c.strokeText(CPLBL[k],tx,ty);c.fillText(CPLBL[k],tx,ty)}})}
  if(label&&!sel){c.fillStyle='#391a29c8';c.font=`600 ${lw*6}px "DM Sans",sans-serif`;c.textAlign='center';const ux=-Math.sin(n.ang),uy=Math.cos(n.ang);c.fillText(label,n.cx-ux*n.L*.95,n.cy-uy*n.L*.95)}c.restore()}
+function handCrop(h,o){const W=o.width,H=o.height;if(!h.lm||h.lm.length<21)return{ox:0,oy:0,cw:W,ch:H};
+ const P=h.lm.map(p=>[p.x*W,p.y*H]);let x0=1e9,x1=-1e9,y0=1e9;P.forEach(([x,y])=>{x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y)});
+ (h.nails||[]).forEach(n=>{if(n.bb){x0=Math.min(x0,n.bb[0]);x1=Math.max(x1,n.bb[2]);y0=Math.min(y0,n.bb[1])}});
+ const mcp=Math.max(P[5][1],P[9][1],P[13][1],P[17][1],P[2][1]),span=Math.max(40,mcp-y0);let y1=mcp+span*.42;
+ const px=(x1-x0)*.07,py=span*.10;x0-=px;x1+=px;y0-=py;
+ if((x1-x0)/(y1-y0)>1.25){const need=(x1-x0)/1.25-(y1-y0);y1+=need}// não deixa a faixa baixa demais
+ x0=Math.max(0,x0);y0=Math.max(0,y0);x1=Math.min(W,x1);y1=Math.min(H,y1);if(x1-x0<W*.25||y1-y0<H*.2)return{ox:0,oy:0,cw:W,ch:H};
+ return{ox:Math.floor(x0),oy:Math.floor(y0),cw:Math.ceil(x1-x0),ch:Math.ceil(y1-y0)}}
 function drawT(){
  if(S.view==='B'){const ks=['L','R'].filter(k=>S.hands[k]),os=ks.map(k=>{styleHand(k);return renderHand(S.hands[k])});if(!os.length)return;
-  const H=Math.min(...os.map(o=>o.height)),gap=os.length>1?Math.round(H*.03):0;let x=0;lay=[];ks.forEach((k,j)=>{const s=H/os[j].height;lay.push({k,x,s,w:os[j].width*s});x+=os[j].width*s+gap});
+  const cr=ks.map((k,j)=>handCrop(S.hands[k],os[j])),H=Math.min(...cr.map(q=>q.ch)),gap=os.length>1?Math.round(H*.025):0;let x=0;lay=[];
+  ks.forEach((k,j)=>{const s=H/cr[j].ch;lay.push({k,x,s,w:cr[j].cw*s,ox:cr[j].ox,oy:cr[j].oy});x+=cr[j].cw*s+gap});
   cv.width=Math.round(x-gap);cv.height=H;const c=cv.getContext('2d');c.clearRect(0,0,cv.width,H);if(S.bgOn){c.fillStyle='#ebe3e5';c.fillRect(0,0,cv.width,H)}
-  lay.forEach((l,j)=>{c.drawImage(os[j],l.x,0,l.w,H);const n=S.sel&&S.sel.k===l.k&&selNail();if(n){c.save();c.translate(l.x,0);c.scale(l.s,l.s);outline(c,n,true,Math.max(2,os[j].width/350));c.restore()}});return}
- const h=S.hands[S.view];if(!h)return;styleHand(S.view);const o=renderHand(h);cv.width=o.width;cv.height=o.height;lay=[{k:S.view,x:0,s:1,w:o.width}];
- const c=cv.getContext('2d');c.drawImage(o,0,0);const lw=Math.max(2,o.width/380);
- if(S.edit)h.nails.forEach((n,i)=>outline(c,n,S.sel&&S.sel.k===S.view&&S.sel.i===i,lw,FING[n.f]));else{const n=S.sel&&S.sel.k===S.view&&selNail();if(n)outline(c,n,true,lw)}}
+  lay.forEach((l,j)=>{c.drawImage(os[j],l.ox,l.oy,cr[j].cw,cr[j].ch,l.x,0,l.w,H);const n=S.sel&&S.sel.k===l.k&&selNail();if(n){c.save();c.beginPath();c.rect(l.x,0,l.w,H);c.clip();c.translate(l.x,0);c.scale(l.s,l.s);c.translate(-l.ox,-l.oy);outline(c,n,true,Math.max(2,cr[j].cw/300));c.restore()}});return}
+ const h=S.hands[S.view];if(!h)return;styleHand(S.view);const o=renderHand(h),q=S.edit?{ox:0,oy:0,cw:o.width,ch:o.height}:handCrop(h,o);cv.width=q.cw;cv.height=q.ch;lay=[{k:S.view,x:0,s:1,w:q.cw,ox:q.ox,oy:q.oy}];
+ const c=cv.getContext('2d');c.drawImage(o,q.ox,q.oy,q.cw,q.ch,0,0,q.cw,q.ch);const lw=Math.max(2,q.cw/320);c.save();c.translate(-q.ox,-q.oy);
+ if(S.edit)h.nails.forEach((n,i)=>outline(c,n,S.sel&&S.sel.k===S.view&&S.sel.i===i,lw,FING[n.f]));else{const n=S.sel&&S.sel.k===S.view&&selNail();if(n)outline(c,n,true,lw)}c.restore()}
 function showT(){const v=S.view,both=S.hands.L&&S.hands.R,h=S.hands[v];$('#views').classList.toggle('hidden',!both);
  document.querySelectorAll('#views [data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
  const is3=v==='3',isB=v==='B',has=isB?(S.hands.L||S.hands.R):h;
@@ -776,14 +789,17 @@ function renderTSide(){if(!S.brushC||!byId(S.brushC))S.brushC=look[0].c;
  $('#tDots').innerHTML=colors().map(c=>`<button class="dot" data-c="${esc(c.id)}" aria-pressed="${c.id===S.brushC}" aria-label="${esc(c.name)}" title="${esc(c.name)}" style="background:${esc(c.hex)}"></button>`).join('');
  const hx=(byId(S.brushC)||{}).hex||'#c8788d';
  $('#tArts').innerHTML=`<button class="art" data-a="" aria-pressed="${!S.brushA}"><img alt="" src="${nailThumb(hx,'liso',44,60)}">Lisa</button>`+arts().map(a=>`<button class="art" data-a="${esc(a.id)}" aria-pressed="${a.id===S.brushA}"><img alt="" src="${nailThumb(hx,a.pat,44,60)}">${esc(a.name.split(' ')[0])}</button>`).join('');
- const nm=(byId(S.brushC)||{}).name||'';const an=S.brushA?' + '+((byId(S.brushA)||{}).name||''):'';$('#fingerLine').textContent=S.pmode==='uma'?'Pincel com '+nm+an+'. Toque na unha para pintar só ela.':nm+an+' nas 10 unhas. Para variar unha por unha, use “Uma por vez”.';setCursor()}
+ const nm=(byId(S.brushC)||{}).name||'';const an=S.brushA?' + '+((byId(S.brushA)||{}).name||''):'';$('#fingerLine').textContent=nm+an;try{renderTarget()}catch(_){};setCursor()}
 $('#tDots').onclick=e=>{const b=e.target.closest('[data-c]');if(b){S.brushC=b.dataset.c;applyPick();renderTSide()}};
 $('#tArts').onclick=e=>{const b=e.target.closest('[data-a]');if(b){S.brushA=b.dataset.a||null;applyPick();renderTSide()}};
 /* escolheu cor ou arte: aplica na hora. Vai para as 10 unhas; depois, tocar numa unha com o pincel pinta só ela. */
+function targetNail(){const t=S.sel;if(!t||S.edit)return null;const h=S.hands[t.k],n=h&&h.nails[t.i];return n?{k:t.k,n,idx:SIDE[t.k]+n.f}:null}
 function applyPick(){if((S.view==='L'||S.view==='R')&&!S.hands[S.view]){const o=S.view==='L'?'R':'L';if(S.hands[o]){S.view=o;S.sel=null;showT()}}
- if(S.pmode!=='uma'){look.forEach(n=>{n.c=S.brushC;n.a=S.brushA});saveLook()}else if(S.hands.L||S.hands.R)toast('Toque na unha que quer pintar.')}
-function setPMode(m){S.pmode=m;try{localStorage.setItem('lume-pmode',m)}catch(_){}document.querySelectorAll('#pmode [data-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
- $('#paintAll').classList.toggle('hidden',m!=='uma');try{renderTSide()}catch(_){}}
+ const t=targetNail();if(t){look[t.idx].c=S.brushC;look[t.idx].a=S.brushA}else look.forEach(n=>{n.c=S.brushC;n.a=S.brushA});saveLook();renderTarget()}
+function renderTarget(){const el=$('#ptarget');if(!el)return;const t=targetNail();
+ el.innerHTML=t?`<span>Pintando só <b>${FING[t.n.f].toLowerCase()} ${t.k==='L'?'esquerdo':'direito'}</b></span><button id="ptAll">Todas as unhas</button>`:`<span>Pintando <b>todas as unhas</b> · toque numa unha da foto para pintar só ela</span>`;
+ const b=$('#ptAll');if(b)b.onclick=()=>{S.sel=null;renderTarget();drawT()}}
+function setPMode(){}
 const SHAPES={natural:'Natural',quadrada:'Quadrada',redonda:'Redonda',amendoada:'Amendoada',bailarina:'Bailarina',stiletto:'Stiletto'},LENS={curta:['Curta',.18],media:['Média',.55],longa:['Longa',1]};
 function renderShapeChips(){const sc=$('#shapeChips'),lc=$('#lenChips');if(!sc)return;sc.innerHTML=Object.entries(SHAPES).map(([k,v])=>`<button data-k="${k}" aria-pressed="${S.shape===k}">${v}</button>`).join('');
  lc.innerHTML=Object.entries(LENS).map(([k,v])=>`<button data-k="${k}" aria-pressed="${S.nlen===k}" ${S.shape==='natural'?'disabled':''}>${v[0]}</button>`).join('');
@@ -802,14 +818,14 @@ function brushPaint(k,i){const h=S.hands[k],n=h&&h.nails[i];if(!n)return;const i
  const before=document.createElement('canvas');before.width=cv.width;before.height=cv.height;before.getContext('2d').drawImage(cv,0,0);
  look[idx].c=S.brushC;look[idx].a=S.brushA;saveLook();
  const after=document.createElement('canvas');after.width=cv.width;after.height=cv.height;after.getContext('2d').drawImage(cv,0,0);
- const l=lay.find(q=>q.k===k)||{x:0,s:1},cx=l.x+n.cx*l.s,cy=n.cy*l.s,L=n.L*l.s,W=n.W*l.s,hex=(byId(S.brushC)||{}).hex,c=cv.getContext('2d'),t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?1:650,id=++brushAnim;
+ const l=lay.find(q=>q.k===k)||{x:0,s:1,ox:0,oy:0},cx=l.x+(n.cx-(l.ox||0))*l.s,cy=(n.cy-(l.oy||0))*l.s,L=n.L*l.s,W=n.W*l.s,hex=(byId(S.brushC)||{}).hex,c=cv.getContext('2d'),t0=performance.now(),dur=matchMedia('(prefers-reduced-motion: reduce)').matches?1:650,id=++brushAnim;
  const frame=now=>{if(id!==brushAnim)return;const t=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-t,2);
   c.drawImage(before,0,0);c.save();c.translate(cx,cy);c.rotate(n.ang);const y0=-L*.62,yy=y0+e*L*1.3;
   c.beginPath();c.rect(-W,y0,W*2,yy-y0);c.clip();c.rotate(-n.ang);c.translate(-cx,-cy);c.drawImage(after,0,0);c.restore();
   if(t<1){const fx=cx-Math.sin(n.ang)*(yy),fy=cy+Math.cos(n.ang)*(yy),wob=Math.sin(t*18)*W*.18;drawBrushAt(c,fx+Math.cos(n.ang)*wob,fy+Math.sin(n.ang)*wob,n.ang,Math.max(L*1.7,60),hex);requestAnimationFrame(frame)}else drawT()};
  requestAnimationFrame(frame)}
 let drag=null;
-function pt(e){const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*cv.height/r.height;const l=lay.find(l=>x>=l.x&&x<=l.x+l.w)||lay[0];return l?{k:l.k,x:(x-l.x)/l.s,y:y/l.s}:null}
+function pt(e){const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*cv.width/r.width,y=(e.clientY-r.top)*cv.height/r.height;const l=lay.find(l=>x>=l.x&&x<=l.x+l.w)||lay[0];return l?{k:l.k,x:(x-l.x)/l.s+(l.ox||0),y:y/l.s+(l.oy||0)}:null}
 function hit(h,p){for(let i=h.nails.length-1;i>=0;i--){const n=h.nails[i],dx=p.x-n.cx,dy=p.y-n.cy,c=Math.cos(-n.ang),s=Math.sin(-n.ang),lx=dx*c-dy*s,ly=dx*s+dy*c;if((lx/(n.W*.6))**2+(ly/(n.L*.6))**2<=1.4)return i}return-1}
 const tolPx=px=>{const r=cv.getBoundingClientRect();return px*cv.width/Math.max(1,r.width)/((lay[0]&&lay[0].s)||1)};
 cv.addEventListener('pointerdown',e=>{const p=pt(e);if(!p)return;const h=S.hands[p.k];if(!h)return;ensureCPonce(h);
@@ -841,7 +857,7 @@ cv.addEventListener('pointermove',e=>{if(!zP.has(e.pointerId))return;zP.set(e.po
 const zUp=e=>{const had=zP.has(e.pointerId);zP.delete(e.pointerId);if(!had||(S.edit&&S.view!=='B'))return;if(zP.size<2)zPinch=null;
  if(zTap&&e.type==='pointerup'&&performance.now()-zTap.t<600){const now=performance.now(),[lx,ly]=zLocal(e);
   if(now-zLastTap<320){zLastTap=0;ZM.z>1.3?zReset(true):zAt(2.5,lx,ly,true);zTap=null;return}zLastTap=now;
-  const p=pt(e);if(p){const h=S.hands[p.k];if(h){ensureCPonce(h);const i=tapNail(h,p);if(i>=0){S.sel=null;brushPaint(p.k,i)}}}}
+  const p=pt(e);if(p){const h=S.hands[p.k];if(h){ensureCPonce(h);const i=tapNail(h,p);if(i>=0){if(S.sel&&S.sel.k===p.k&&S.sel.i===i)S.sel=null;else S.sel={k:p.k,i};renderTarget();drawT();if(S.sel)toast('Agora toque numa cor: vai só para essa unha.')}else if(S.sel){S.sel=null;renderTarget();drawT()}}}}
  zTap=null;if(!zP.size)zPan=null};
 cv.addEventListener('pointerup',zUp);cv.addEventListener('pointercancel',zUp);
 cv.addEventListener('wheel',e=>{if(!S.hands.L&&!S.hands.R)return;e.preventDefault();const[lx,ly]=zLocal(e);zAt(Math.exp(-e.deltaY*.0018),lx,ly)},{passive:false});
@@ -851,9 +867,9 @@ cv.addEventListener('wheel',e=>{if(!S.hands.L&&!S.hands.R)return;e.preventDefaul
 cv.addEventListener('touchstart',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 cv.addEventListener('touchmove',e=>{if(e.touches.length>1||ZM.z>1.001)e.preventDefault()},{passive:false});
 cv.addEventListener('dblclick',e=>e.preventDefault());
-document.querySelectorAll('#pmode [data-m]').forEach(b=>b.onclick=()=>setPMode(b.dataset.m));setTimeout(()=>setPMode(S.pmode),0);
+setTimeout(()=>{try{renderTarget()}catch(_){}},0);
 $('#zIn').onclick=()=>zAt(1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zOut').onclick=()=>zAt(1/1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zReset').onclick=()=>zReset(true);
-const _drawT0=drawT;drawT=function(){_drawT0();try{zApply()}catch(_){}};
+const _drawT0=drawT;drawT=function(){_drawT0();try{zApply()}catch(_){}try{renderTarget()}catch(_){}};
 function ensureCPonce(h){if(h.nails.some(n=>!n.cp))ensureCP(h)}
 cv.addEventListener('pointermove',e=>{if(!drag)return;const p=pt(e),n=S.hands[S.view].nails[drag.i];
 n.edited=1; if(drag.move){const dx=p.x-drag.move[0],dy=p.y-drag.move[1];n.cp=drag.start.map(([x,y])=>[x+dx,y+dy])}else{n.cp[drag.j]=[p.x,p.y]}updPoly(n);drawT()});
