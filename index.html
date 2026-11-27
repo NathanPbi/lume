@@ -388,7 +388,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-big12</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-big13</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -949,7 +949,7 @@ const CURL_T=[[0.3443,0.5634,0.2631,0],[0.087,0.2464,0.1827,1],[0.3777,0.349,0.1
 const POSETIPS={aberta:['Costas da mão para cima, unhas viradas para a câmera','Dedos abertos como no contorno, polegar para o lado','Celular reto, a uns 25 cm da mão','Boa luz, sem flash'],
  dobrada:['Dobre os dedos como no modelo, unhas de frente para a câmera','Polegar na frente, mostrando a unha inteira','Celular a uns 20 cm, de frente para as unhas','Boa luz, sem flash e sem sombra nas unhas']};
 function poseUI(L){if(L===undefined)L=S.view!=='R';const d=S.pose==='dobrada';document.querySelectorAll('#poseTog [data-p]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.p===S.pose));
- const ei=$('#exImg'),eg=$('#exGuide');if(d){ei.src='ex-curl.webp';eg.src='guide-curl.png';const f=L?'scaleX(-1)':'';ei.style.transform=f;eg.style.transform=f}else{ei.style.transform='';eg.style.transform=''}
+ const ei=$('#exImg'),eg=$('#exGuide');if(d){ei.src='ex-curl.webp';eg.src='guide-curl.png';const f=L?'scaleX(-1)':'';ei.style.transform=f;eg.style.transform=f}else{ei.src=L?'hand-example-left.webp':'hand-example-right.webp';eg.src=L?'guide-left.png':'guide-right.png';ei.style.transform='';eg.style.transform=''}
  $('#emptyP').textContent=d?(L?'Mão esquerda com os dedos dobrados, igual ao modelo.':'Agora a direita, com os dedos dobrados.'):(L?'Posicione a mão igual ao modelo.':'Agora a direita, igual ao modelo. Depois eu junto as duas.');
  $('#tipList').innerHTML=POSETIPS[S.pose].map(t=>`<li>${t}</li>`).join('')}
 document.querySelectorAll('#poseTog [data-p]').forEach(b=>b.onclick=()=>{S.pose=b.dataset.p;try{localStorage.setItem('lume-pose',S.pose)}catch(_){}poseUI()});
