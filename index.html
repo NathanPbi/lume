@@ -380,7 +380,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-perto6</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-perto7</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -867,6 +867,10 @@ cv.addEventListener('wheel',e=>{if(!S.hands.L&&!S.hands.R)return;e.preventDefaul
 cv.addEventListener('touchstart',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 cv.addEventListener('touchmove',e=>{if(e.touches.length>1||ZM.z>1.001)e.preventDefault()},{passive:false});
 cv.addEventListener('dblclick',e=>e.preventDefault());
+
+/* tocar fora (fora da foto, das cores e das nail arts) tira a marcação: volta a pintar todas */
+document.addEventListener('pointerup',e=>{if(!S.sel||S.edit||!trDlg.open)return;const t=e.target;
+ if(t.closest&&t.closest('#cv,#tDots,#tArts,#ptarget,.zbar,#adj,#editCtl,#views'))return;S.sel=null;renderTarget();drawT()},true);
 setTimeout(()=>{try{renderTarget()}catch(_){}},0);
 $('#zIn').onclick=()=>zAt(1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zOut').onclick=()=>zAt(1/1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zReset').onclick=()=>zReset(true);
 const _drawT0=drawT;drawT=function(){_drawT0();try{zApply()}catch(_){}try{renderTarget()}catch(_){}};
