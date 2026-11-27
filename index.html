@@ -180,6 +180,43 @@ dialog::backdrop{background:#2a101c88}.chips{display:flex;flex-wrap:wrap;gap:6px
  .grid .sample .det{padding:9px 2px 0}.grid .sample .det b{display:block;font:14px/1.15 "DM Serif Text",Georgia,serif;font-weight:400;letter-spacing:-.1px}
  .grid .sample .det small{display:block;margin-top:3px;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.7}
 }
+
+.pmode{display:flex;align-items:center;gap:4px;margin:0 0 10px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.pmode span{margin-right:6px}.pmode button{border:1px solid var(--line);background:transparent;color:inherit;border-radius:999px;padding:5px 12px;font:600 12.5px/1 inherit;letter-spacing:0;text-transform:none;cursor:pointer}
+.pmode button[aria-pressed=true]{background:var(--wine);border-color:var(--wine);color:#fff}
+#brushIco{flex:none;width:40px;height:40px;display:grid;place-items:center;overflow:hidden}#brushIco svg{width:40px;height:40px}
+.art{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:760px){
+ #views{display:flex;width:100%;overflow-x:auto;scrollbar-width:none}#views::-webkit-scrollbar{display:none}
+ #views button{flex:1 0 auto;white-space:nowrap;padding:0 11px;font-size:13px;min-height:34px;justify-content:center}
+ .dh{padding:14px 16px 4px}.dh h2{font-size:22px}.tgrid{padding:0 12px 14px;gap:10px}
+ .box{padding:12px 12px 10px}.box h4{font-size:18px;margin-bottom:6px}
+ #tDots.dots{padding-left:9px;padding-top:6px;padding-bottom:8px}.dots{gap:9px;scroll-snap-type:x mandatory;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);padding-right:24px}
+ .dots .dot{scroll-snap-align:start;width:36px;height:36px}
+ .arts{gap:7px;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 22px),transparent);padding-right:20px}
+ #tArts .art{width:88px;font-size:11.5px;padding:7px 4px 6px;letter-spacing:-.1px}
+ .under{gap:8px 16px;font-size:12.5px;justify-content:flex-start}.under #exp{flex:1 1 100%;font-size:11.5px;line-height:1.35}.under .sp{display:none}.under>label,.under>button{flex:none}
+ .under .toggle{width:38px;height:22px}.under .toggle:after{width:16px;height:16px}
+ .brushbox p{font-size:13px;line-height:1.4}
+ .pmode{font-size:11px}.pmode button{padding:6px 12px}
+}
+
+/* ---- celular: layout que aguenta as fontes reais e telas pequenas ---- */
+@media(max-width:760px){
+ .shead{flex-direction:column;align-items:stretch!important;gap:10px;flex-wrap:nowrap}
+ .shead h2{white-space:normal!important;font-size:24px!important}
+ #catSeg{display:flex;width:100%}#catSeg button{flex:1;justify-content:center}
+ .hero h1{font-size:clamp(30px,9.4vw,40px)!important;line-height:1.02}
+ .hero-c p{font-size:13.5px!important;max-width:34ch!important}
+ .hero .wine{white-space:nowrap;font-size:clamp(13px,3.7vw,15px)!important;padding:10px 16px!important}
+ .grid .sample{flex:0 0 96px!important}.grid .sample .pic{width:96px!important;height:96px!important}
+ .grid .sample .det{width:100%;padding:8px 0 0!important}
+ .grid .sample .det b{font-size:13.5px!important;line-height:1.15;min-height:2.3em;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+ .grid .sample .det small{font-size:9px!important;letter-spacing:.14em!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .toast{bottom:auto;top:calc(68px + env(safe-area-inset-top));max-width:min(88vw,360px);padding:9px 16px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .toast .i{flex:none}
+}
+@media(max-width:380px){.dh h2{font-size:19px!important}#views button{font-size:12px!important;padding:0 8px!important}.hero-c p{display:none}.grid .sample{flex-basis:88px!important}.grid .sample .pic{width:88px!important;height:88px!important}}
 .stage{background:var(--rose);border-radius:16px;min-height:320px;display:grid;place-items:center;position:relative;overflow:hidden}
 .stage canvas.photo{display:block;max-width:100%;max-height:58vh;width:auto;height:auto;touch-action:none}
 .empty{text-align:center;padding:22px 16px;display:grid;justify-items:center;gap:8px;max-width:420px}
@@ -339,7 +376,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-zoom2</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-resp4</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -352,7 +389,7 @@ input[type=range]{width:100%;accent-color:#65243b}
     <div class="side">
       <div class="box"><h4>Esmalte</h4><div class="dots" id="tDots"></div></div>
       <div class="box"><h4>Nail art</h4><div class="arts" id="tArts"></div></div>
-      <div class="box brushbox"><div style="display:flex;gap:12px;align-items:center"><span id="brushIco" aria-hidden="true"></span><p class="fingerline" id="fingerLine" style="margin:0">Escolha a cor e toque na unha: o pincel passa o esmalte nela.</p></div>
+      <div class="box brushbox"><div class="pmode" id="pmode" role="group" aria-label="Como pintar"><span>Pintar</span><button data-m="todas" aria-pressed="true">Todas</button><button data-m="uma" aria-pressed="false">Uma por vez</button></div><div style="display:flex;gap:12px;align-items:center"><span id="brushIco" aria-hidden="true"></span><p class="fingerline" id="fingerLine" style="margin:0">Escolha a cor e toque na unha: o pincel passa o esmalte nela.</p></div>
         <button class="ghost" id="paintAll" style="width:100%;margin-top:10px">Pintar todas as unhas com esta cor</button></div>
       <details class="box" id="adj"><summary>Ajustar marcação das unhas</summary>
         <p class="muted" style="margin:4px 0 8px">Ligue o ajuste e toque numa unha: arraste as bolinhas da cutícula, das laterais e da ponta até a borda real. Arraste o meio para mover. Toque num espaço vazio para marcar uma unha que faltou.</p>
@@ -508,7 +545,7 @@ const byId=id=>D.items.find(i=>i.id===id);
 let look;try{look=JSON.parse(localStorage.getItem('lume-look')||'null')}catch(_){look=null}
 if(!Array.isArray(look)||look.length!==10)look=Array.from({length:10},()=>({c:'cereja-noire',a:null}));
 look=look.map(n=>({c:byId(n.c)&&byId(n.c).on?n.c:(colors()[0]||{}).id,a:n.a&&byId(n.a)&&byId(n.a).on?n.a:null}));
-const S=window.__lume={shape:'natural',nlen:(()=>{try{return localStorage.getItem('lume-nlen')||'media'}catch(_){return 'media'}})(),align:(()=>{try{return localStorage.getItem('lume-align')!=='0'}catch(_){return true}})(),bgOn:(()=>{try{return localStorage.getItem('lume-bg')!=='0'}catch(_){return true}})(),page:'provador',cat:'color',filt:'Todos',view:'L',edit:false,sel:null,scope:'all',f3:1,hands:{R:null,L:null},color:'#731b35',design:'liso',pro:'cat'};
+const S=window.__lume={pmode:(()=>{try{return localStorage.getItem('lume-pmode')||'todas'}catch(_){return 'todas'}})(),shape:'natural',nlen:(()=>{try{return localStorage.getItem('lume-nlen')||'media'}catch(_){return 'media'}})(),align:(()=>{try{return localStorage.getItem('lume-align')!=='0'}catch(_){return true}})(),bgOn:(()=>{try{return localStorage.getItem('lume-bg')!=='0'}catch(_){return true}})(),page:'provador',cat:'color',filt:'Todos',view:'L',edit:false,sel:null,scope:'all',f3:1,hands:{R:null,L:null},color:'#731b35',design:'liso',pro:'cat'};
 function nailStyle(i){const n=look[i],c=byId(n.c),a=n.a?byId(n.a):null;return{color:c?c.hex:'#ccc',finish:c&&c.finish||'Cremoso',design:a?a.pat:'liso'}}
 function saveLook(){try{localStorage.setItem('lume-look',JSON.stringify(look))}catch(_){}renderSummary();paintHero();if(trDlg.open){drawT();if(S.view==='3')upd3D()}renderGrid()}
 function quote(){let p=D.settings.base,m=D.settings.dur;look.forEach(n=>{const c=byId(n.c),a=n.a&&byId(n.a);p+=(c?c.price:0)+(a?a.price:0);m+=(c?c.min:0)+(a?a.min:0)});return{p,m}}
@@ -517,6 +554,19 @@ function quote(){let p=D.settings.base,m=D.settings.dur;look.forEach(n=>{const c
 const thumbCache=new Map();
 function nailThumb(hex,pat,w=60,h=84){const k=hex+pat+w;if(thumbCache.has(k))return thumbCache.get(k);const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.translate(w/2,h/2);x.scale(1,-1);drawDesign(x,pat||'liso',hex,w*.82,h*.84,5);
  x.setTransform(1,0,0,1,0,0);const g=x.createLinearGradient(0,0,w,0);g.addColorStop(.22,'#fff0');g.addColorStop(.32,'#fff6');g.addColorStop(.42,'#fff0');x.globalCompositeOperation='source-atop';x.fillStyle=g;x.fillRect(0,0,w,h);const u=c.toDataURL();thumbCache.set(k,u);return u}
+
+/* amostra de esmalte desenhada (para cores sem foto): uma gota/pincelada brilhante no mesmo estilo das fotos */
+const dropCache={};
+function polishDrop(hex,fin){const k=hex+'|'+(fin||'');if(dropCache[k])return dropCache[k];const W=420,H=320,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+ x.fillStyle=mix(hex,'#ffffff',.84);x.fillRect(0,0,W,H);const bg=x.createRadialGradient(W*.3,H*.2,10,W*.5,H*.5,W*.8);bg.addColorStop(0,'#ffffff55');bg.addColorStop(1,'#00000010');x.fillStyle=bg;x.fillRect(0,0,W,H);
+ const blob=()=>{x.beginPath();x.moveTo(W*.10,H*.58);x.bezierCurveTo(W*.08,H*.30,W*.36,H*.16,W*.58,H*.26);x.bezierCurveTo(W*.70,H*.31,W*.82,H*.28,W*.96,H*.20);x.bezierCurveTo(W*.92,H*.36,W*.80,H*.48,W*.66,H*.62);x.bezierCurveTo(W*.50,H*.80,W*.16,H*.86,W*.10,H*.58);x.closePath()};
+ x.save();x.filter='blur(14px)';x.globalAlpha=.35;x.translate(8,18);blob();x.fillStyle=mix(hex,'#000000',.55);x.fill();x.restore();
+ const g=x.createLinearGradient(W*.15,H*.2,W*.7,H*.85);g.addColorStop(0,mix(hex,'#ffffff',.22));g.addColorStop(.45,hex);g.addColorStop(1,mix(hex,'#000000',.38));blob();x.fillStyle=g;x.fill();
+ x.save();blob();x.clip();const rg=x.createRadialGradient(W*.32,H*.34,4,W*.32,H*.34,W*.32);rg.addColorStop(0,'#ffffff40');rg.addColorStop(1,'#ffffff00');x.fillStyle=rg;x.fillRect(0,0,W,H);
+ x.strokeStyle='#ffffffcc';x.lineCap='round';x.lineWidth=11;x.filter='blur(2.5px)';x.beginPath();x.moveTo(W*.20,H*.47);x.bezierCurveTo(W*.24,H*.33,W*.38,H*.27,W*.52,H*.31);x.stroke();
+ x.lineWidth=6;x.globalAlpha=.7;x.beginPath();x.moveTo(W*.64,H*.33);x.quadraticCurveTo(W*.76,H*.30,W*.86,H*.25);x.stroke();x.filter='none';x.globalAlpha=1;
+ if(/cinti|glit|metal|perol/i.test(fin||'')){for(let i=0;i<140;i++){const px=W*(.12+Math.random()*.8),py=H*(.22+Math.random()*.6);x.fillStyle=`rgba(255,255,255,${.25+Math.random()*.55})`;x.beginPath();x.arc(px,py,.8+Math.random()*1.6,0,7);x.fill()}}
+ x.restore();return dropCache[k]=c.toDataURL('image/jpeg',.9)}
 function swatchCard(it){const c=document.createElement('canvas');c.width=280;c.height=210;const x=c.getContext('2d');x.fillStyle=it.kind==='art'?'#f6e7e4':mix(it.hex,'#ffffff',.82);x.fillRect(0,0,280,210);
  x.translate(140,105);x.rotate(-.35);x.scale(1,-1);drawDesign(x,it.kind==='art'?it.pat:'liso',it.kind==='art'?(it.pat==='franc'?'#e8bfae':'#c8788d'):it.hex,74,130,3);return c.toDataURL()}
 
@@ -525,7 +575,7 @@ function renderFilt(){const f=$('#filt');if(S.cat!=='color'){f.innerHTML='';retu
  f.innerHTML=fs.map(x=>`<button class="chipf" data-f="${esc(x)}" aria-pressed="${x===S.filt}">${x==='Todos'?'Todos os acabamentos':esc(x)}</button>`).join('')}
 function renderGrid(){const list=(S.cat==='color'?colors().filter(c=>S.filt==='Todos'||c.finish===S.filt):arts());
  $('#grid').innerHTML=list.map(it=>{const sel=it.kind==='color'?look.every(n=>n.c===it.id):look.some(n=>n.a===it.id);
-  const src=it.img||swatchCard(it);
+  const src=it.img||(it.kind==='color'?polishDrop(it.hex,it.finish):swatchCard(it));
   return`<button class="sample" data-id="${esc(it.id)}" aria-pressed="${sel}"><div class="pic" style="background:${it.kind==='color'?esc(it.hex)+'22':'#f6e7e4'}"><img alt="" src="${esc(src)}"><span class="act"><svg class="i" style="width:14px;height:14px"><use href="#i-${sel?'check':'plus'}"/></svg></span></div>
   <div class="det"><b>${esc(it.name)}</b><small>${it.kind==='art'?brl(it.price)+' por unha':esc(it.finish)}</small></div></button>`}).join('')||'<p class="muted">Nenhum item disponível nesta seleção.</p>'}
 function renderSummary(){const row=(a,b)=>look.slice(a,b).map((n,k)=>{const s=nailStyle(a+k);return`<img class="mn" alt="" src="${nailThumb(s.color,s.design,44,60)}" title="${FING[k]}">`}).join('');
@@ -571,7 +621,7 @@ document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{i
 $('#catSeg').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;S.cat=b.dataset.k;$('#catSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderFilt();renderGrid()};
 $('#filt').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;S.filt=b.dataset.f;renderFilt();renderGrid()};
 $('#grid').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;const it=byId(b.dataset.id);if(!it)return;
- if(it.kind==='color'){look.forEach(n=>n.c=it.id);saveLook();toast(it.name+' aplicado nas duas mãos.')}else artDialog(it)};
+ if(it.kind==='color'){look.forEach(n=>n.c=it.id);saveLook();toast(it.name+' nas duas mãos')}else artDialog(it)};
 const fingerOpts=()=>['direita','esquerda'].flatMap((h,j)=>FING.map((f,k)=>`<option value="${j*5+k}">${f} · mão ${h}</option>`)).join('');
 function artDialog(it){openDlg(it.name,`<p class="muted">${brl(it.price)} por unha · +${it.min} min por unha</p>
  <label class="field">Aplicar em<select id="artScope"><option value="ring">Anelar das duas mãos</option><option value="all">Todas as unhas</option>${fingerOpts()}<option value="none">Tirar este desenho</option></select></label>
@@ -726,11 +776,14 @@ function renderTSide(){if(!S.brushC||!byId(S.brushC))S.brushC=look[0].c;
  $('#tDots').innerHTML=colors().map(c=>`<button class="dot" data-c="${esc(c.id)}" aria-pressed="${c.id===S.brushC}" aria-label="${esc(c.name)}" title="${esc(c.name)}" style="background:${esc(c.hex)}"></button>`).join('');
  const hx=(byId(S.brushC)||{}).hex||'#c8788d';
  $('#tArts').innerHTML=`<button class="art" data-a="" aria-pressed="${!S.brushA}"><img alt="" src="${nailThumb(hx,'liso',44,60)}">Lisa</button>`+arts().map(a=>`<button class="art" data-a="${esc(a.id)}" aria-pressed="${a.id===S.brushA}"><img alt="" src="${nailThumb(hx,a.pat,44,60)}">${esc(a.name.split(' ')[0])}</button>`).join('');
- const nm=(byId(S.brushC)||{}).name||'';$('#fingerLine').textContent='Pincel com '+nm+(S.brushA?' + '+((byId(S.brushA)||{}).name||''):'')+'. Toque numa unha para pintar.';setCursor()}
+ const nm=(byId(S.brushC)||{}).name||'';const an=S.brushA?' + '+((byId(S.brushA)||{}).name||''):'';$('#fingerLine').textContent=S.pmode==='uma'?'Pincel com '+nm+an+'. Toque na unha para pintar só ela.':nm+an+' nas 10 unhas. Para variar unha por unha, use “Uma por vez”.';setCursor()}
 $('#tDots').onclick=e=>{const b=e.target.closest('[data-c]');if(b){S.brushC=b.dataset.c;applyPick();renderTSide()}};
 $('#tArts').onclick=e=>{const b=e.target.closest('[data-a]');if(b){S.brushA=b.dataset.a||null;applyPick();renderTSide()}};
 /* escolheu cor ou arte: aplica na hora. Vai para as 10 unhas; depois, tocar numa unha com o pincel pinta só ela. */
-function applyPick(){if((S.view==='L'||S.view==='R')&&!S.hands[S.view]){const o=S.view==='L'?'R':'L';if(S.hands[o]){S.view=o;S.sel=null;showT()}}if(S.hands.L||S.hands.R)toast('Agora toque na unha que quer pintar, ou em “Pintar todas”.')}
+function applyPick(){if((S.view==='L'||S.view==='R')&&!S.hands[S.view]){const o=S.view==='L'?'R':'L';if(S.hands[o]){S.view=o;S.sel=null;showT()}}
+ if(S.pmode!=='uma'){look.forEach(n=>{n.c=S.brushC;n.a=S.brushA});saveLook()}else if(S.hands.L||S.hands.R)toast('Toque na unha que quer pintar.')}
+function setPMode(m){S.pmode=m;try{localStorage.setItem('lume-pmode',m)}catch(_){}document.querySelectorAll('#pmode [data-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));
+ $('#paintAll').classList.toggle('hidden',m!=='uma');try{renderTSide()}catch(_){}}
 const SHAPES={natural:'Natural',quadrada:'Quadrada',redonda:'Redonda',amendoada:'Amendoada',bailarina:'Bailarina',stiletto:'Stiletto'},LENS={curta:['Curta',.18],media:['Média',.55],longa:['Longa',1]};
 function renderShapeChips(){const sc=$('#shapeChips'),lc=$('#lenChips');if(!sc)return;sc.innerHTML=Object.entries(SHAPES).map(([k,v])=>`<button data-k="${k}" aria-pressed="${S.shape===k}">${v}</button>`).join('');
  lc.innerHTML=Object.entries(LENS).map(([k,v])=>`<button data-k="${k}" aria-pressed="${S.nlen===k}" ${S.shape==='natural'?'disabled':''}>${v[0]}</button>`).join('');
@@ -798,6 +851,7 @@ cv.addEventListener('wheel',e=>{if(!S.hands.L&&!S.hands.R)return;e.preventDefaul
 cv.addEventListener('touchstart',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 cv.addEventListener('touchmove',e=>{if(e.touches.length>1||ZM.z>1.001)e.preventDefault()},{passive:false});
 cv.addEventListener('dblclick',e=>e.preventDefault());
+document.querySelectorAll('#pmode [data-m]').forEach(b=>b.onclick=()=>setPMode(b.dataset.m));setTimeout(()=>setPMode(S.pmode),0);
 $('#zIn').onclick=()=>zAt(1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zOut').onclick=()=>zAt(1/1.5,cv.offsetWidth/2,cv.offsetHeight/2,true);$('#zReset').onclick=()=>zReset(true);
 const _drawT0=drawT;drawT=function(){_drawT0();try{zApply()}catch(_){}};
 function ensureCPonce(h){if(h.nails.some(n=>!n.cp))ensureCP(h)}
@@ -829,7 +883,7 @@ function alignToTemplate(c,lm,k,mask){try{const W=c.width,H=c.height,P=lm.map(p=
  const M=simil(PALM.map(i=>P[i]),PALM.map(i=>T[i]));if(!isFinite(M.sc)||M.sc<=0)return null;
  const f=Math.max(1,Math.min(1400/TPLH,1/M.sc)),OW=Math.round(TPLW*f),OH=Math.round(TPLH*f),out=document.createElement('canvas');out.width=OW;out.height=OH;const o=out.getContext('2d');
  const gr=o.createRadialGradient(OW/2,OH*.4,0,OW/2,OH*.4,Math.max(OW,OH)*.8);gr.addColorStop(0,'#f6f1f2');gr.addColorStop(1,'#e7dfe1');o.fillStyle=gr;o.fillRect(0,0,OW,OH);
- const xf=x=>{x.setTransform(M.co*f,M.si*f,-M.si*f,M.co*f,M.tx*f,M.ty*f);x.imageSmoothingQuality='high'};xf(o);o.drawImage(c,0,0);o.setTransform(1,0,0,1,0,0);
+ const xf=x=>{x.setTransform(M.co*f,M.si*f,-M.si*f,M.co*f,M.tx*f,M.ty*f);x.imageSmoothingQuality='high'};try{o.save();o.filter='blur('+Math.round(OW*.04)+'px)';o.globalAlpha=.9;o.drawImage(c,-OW*.15,-OH*.15,OW*1.3,OH*1.3);o.restore();o.filter='none'}catch(_){}xf(o);o.drawImage(c,0,0);o.setTransform(1,0,0,1,0,0);
  let m2=null;if(mask){const fm=document.createElement('canvas');fm.width=W;fm.height=H;const fx=fm.getContext('2d',{willReadFrequently:true});fx.drawImage(mask,0,0,W,H);
   const id=fx.getImageData(0,0,W,H),dd=id.data,e=Math.max(4,Math.min(W,H)*.045);for(let y=0;y<H;y++)for(let x=0;x<W;x++){const d=Math.min(x,y,W-1-x,H-1-y);if(d<e)dd[(y*W+x)*4+3]*=d/e}fx.putImageData(id,0,0);
   m2=document.createElement('canvas');m2.width=OW;m2.height=OH;const mx=m2.getContext('2d');xf(mx);mx.drawImage(fm,0,0)}
