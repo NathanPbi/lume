@@ -395,7 +395,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v28.11-gal21</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v28.11-gal22</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -951,9 +951,13 @@ $('#delBtn').onclick=()=>{const h=S.sel&&S.hands[S.sel.k];if(h){h.nails.splice(S
 $('#editBtn').onclick=()=>setEdit(!S.edit);
 document.querySelectorAll('#views [data-v]').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;S.sel=null;if(S.edit&&(S.view==='B'||S.view==='3'))setEdit(false);showT()});
 $('#nextBtn').onclick=()=>{S.view='R';S.edit=false;S.sel=null;showT()};
-const pfGot=(e,k)=>{const i=e.target,f=i.files&&i.files[0];(window.nvDbg||(()=>{}))('evento '+e.type+': '+(f?(f.name+' | '+(f.type||'sem tipo')+' | '+(f.size/1048576).toFixed(1)+' MB'):'nenhum arquivo'));if(!f){return}if(i._busy===f)return;i._busy=f;try{const td=document.getElementById('tryon');if(td&&!td.open){td.showModal();(window.nvDbg||(()=>{}))('provador estava fechado: reabri')}}catch(_){}const mb=(f.size/1048576).toFixed(1);try{toast('Foto recebida ('+(f.type||'formato desconhecido')+', '+mb+' MB). Analisando…')}catch(_){}setTimeout(()=>{i.value='';i._busy=null},1500);onPhoto(f,k||(S.view==='R'?'R':'L'))};
-document.querySelectorAll('.pf').forEach(i=>{i.addEventListener('change',e=>pfGot(e));i.addEventListener('input',e=>pfGot(e))});
-document.querySelectorAll('.pf2').forEach(i=>{const h=e=>pfGot(e,e.target.dataset.k||(S.view==='R'?'R':'L'));i.addEventListener('change',h);i.addEventListener('input',h)});
+const pfGot=(e,k)=>{const i=e.target||e,f=i.files&&i.files[0];(window.nvDbg||(()=>{}))('evento '+(e.type||'verificação')+': '+(f?(f.name+' | '+(f.type||'sem tipo')+' | '+(f.size/1048576).toFixed(1)+' MB'):'nenhum arquivo'));if(!f||i._done===f)return;i._done=f;
+ try{const td=document.getElementById('tryon');if(td&&!td.open){td.showModal()}}catch(_){}
+ const ep=document.getElementById('emptyP');if(ep)ep.textContent='Foto recebida. Analisando as unhas…';try{toast('Foto recebida. Analisando…')}catch(_){}
+ const kk=k||i.dataset.k||(S.view==='R'?'R':'L');Promise.resolve(onPhoto(f,kk)).finally(()=>{setTimeout(()=>{try{i.value=''}catch(_){}i._done=null},800)})};
+document.querySelectorAll('input[type=file]').forEach(i=>{if(i.closest('#tryon')){const h=e=>pfGot(e);i.addEventListener('change',h);i.addEventListener('input',h)}});
+/* iPhone: às vezes o Safari não avisa (change) que a foto foi escolhida. Conferimos sozinhos. */
+setInterval(()=>{try{document.querySelectorAll('#tryon input[type=file]').forEach(i=>{const f=i.files&&i.files[0];if(f&&i._done!==f)pfGot({type:'verificação',target:i})})}catch(_){}},500);
 $('#useEx').onclick=()=>{const k=S.view==='R'?'R':'L';onPhoto(k==='L'?'hand-example-left.webp':'hand-example-right.webp',k)};
 
 /* ---------- mão no padrão do painel: alinha a foto ao modelo e guia a pessoa ---------- */
