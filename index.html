@@ -393,7 +393,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-ia16</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-gal17</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -760,15 +760,21 @@ function dbGet(k){return new Promise(r=>{try{const q=db.transaction('h').objectS
 function save(k){const h=S.hands[k];if(!h)return;dbPut(k,{img:h.jpg,aiOriginal:h.aiOriginal,ts:h.ts,lm:h.lm,mask:h.maskURL||null,nails:h.nails.map(({f,cx,cy,L,W,ang,cp,edited})=>({f,cx,cy,L,W,ang,cp:edited?cp:undefined,edited}))})}
 let saveT=null;const saveSoon=k=>{clearTimeout(saveT);saveT=setTimeout(()=>save(k),400)};
 const DAY=864e5;
+
+/* abre a foto da galeria com segurança no iPhone: fotos grandes (48 MP), HEIC e orientação */
+async function fileToImage(f){
+ if(f.type&&!/^image\//.test(f.type))throw Error('tipo');
+ if(window.createImageBitmap){try{const bm=await createImageBitmap(f,{imageOrientation:'from-image'});const s=Math.min(1,2000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);bm.close&&bm.close();return c}catch(_){}}
+ const u=URL.createObjectURL(f);try{return await loadImg(u)}finally{setTimeout(()=>URL.revokeObjectURL(u),4000)}}
 async function takePhoto(src,k){status('Preparando a foto…');
- try{const im=typeof src==='string'?await loadImg(src):await (async()=>{const u=URL.createObjectURL(src),i=await loadImg(u);URL.revokeObjectURL(u);return i})();
+ try{const im=typeof src==='string'?await loadImg(src):await fileToImage(src);
   let c=toCanvas(im,1400);{const ex=exposureIssue(c);if(ex&&typeof src!=='string'){status(ex);await new Promise(r=>setTimeout(r,2600))}}const h={src:c,orig:c,jpg:c.toDataURL('image/jpeg',.85),ts:Date.now(),nails:[]};S.hands[k]=h;S.sel=null;S.view=k;S._zv=null;showT();status('Procurando as unhas…');
   let lm=(S.pose==='dobrada'&&typeof src!=='string')?null:await detect(toCanvas(im,960));let poseTip='';h.pose=S.pose;
   if(lm){h.lm=lm.map(p=>({x:p.x,y:p.y}));status('Recortando a mão (IA no aparelho)…');await new Promise(r=>setTimeout(r,30));try{h.mask=await handMaskMT(c,h.lm)}catch(_){h.mask=null}
   if(S.align&&typeof src!=='string'){const A=alignToTemplate(c,lm,k,h.mask);if(A){c=A.canvas;lm=A.lm;h.lm=lm.map(p=>({x:p.x,y:p.y}));h.mask=A.mask;poseTip=A.tip;h.aiOriginal=h.jpg;Object.assign(h,{src:c,orig:c,jpg:c.toDataURL('image/jpeg',.88)})}}
   const fwE=Math.hypot((lm[5].x-lm[9].x)*c.width,(lm[5].y-lm[9].y)*c.height)||20;try{h.bg=h.mask?composeNeutral(c,h.mask,fwE):neutralBg(c,h.lm)}catch(_){h.bg=null}try{h.maskURL=h.mask?h.mask.toDataURL('image/png'):null}catch(_){}h.src=S.bgOn&&h.bg?h.bg:c;h.nails=nailsFromLm(lm,c.width,c.height);status('Encontrando cada unha com IA…');h.yolo=await nailSeg(c,lm);if(h.yolo){status('Conferindo cada dedo…');h.yolo=await nailSegFill(c,h.nails,h.yolo)}status('Lendo o formato de cada unha…');await new Promise(r=>setTimeout(r,30));let fit=false;try{fit=fitFromMask(h)}catch(_){}if(!fit)try{anatomize(h)}catch(_){}if(!fit)h.nails.forEach(n=>delete n.cp);ensureCP(h);status(poseTip);if(poseTip)setTimeout(()=>status(''),6000)}else{status(S.pose==='dobrada'?'Encontrando cada unha com IA…':'Procurando as unhas direto na foto…');let ok=0;try{ok=await nailsWithoutHand(h,c)}catch(e){console.warn(e)}
    if(ok){status('');}else{status('Não achei as unhas sozinho. Abra "Ajustar marcação" e toque em cada unha.');$('#adj').open=true;setEdit(true);setTimeout(()=>status(''),5000)}}
-  save(k);showT();return h.nails.length}catch(e){status('Não consegui abrir essa foto. Tente outra.');setTimeout(()=>status(''),4000);return 0}}
+  save(k);showT();return h.nails.length}catch(e){status('Não consegui abrir essa foto. Tente outra, ou tire a foto pelo app.');setTimeout(()=>status(''),5000);return 0}}
 async function onPhoto(src,k){const n=await takePhoto(src,k);if(!n)return;
  if(k==='L'&&!S.hands.R)setTimeout(()=>{if(S.view==='L'&&!S.hands.R){S.view='R';showT()}},1300);else if(S.hands.L&&S.hands.R)setTimeout(()=>{S.view='B';showT()},900)}
 function selNail(){if(!S.sel)return null;const h=S.hands[S.sel.k];return h&&h.nails[S.sel.i]||null}
