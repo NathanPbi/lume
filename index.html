@@ -228,6 +228,11 @@ dialog::backdrop{background:#2a101c88}.chips{display:flex;flex-wrap:wrap;gap:6px
 #camDlg .chint .cico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;background:#ffffff22;display:grid;place-items:center;font-size:17px}
 #camDlg .chint.ok{background:#1f7a4ce8}#camDlg .chint.near{background:#8a5a10e6}
 #camDlg .cdown{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:86px;height:86px;border-radius:50%;background:#1f7a4ccc;color:#fff;font:700 40px/86px inherit;text-align:center;box-shadow:0 0 0 6px #ffffff44}
+.aiDlg{width:min(94vw,540px);max-height:92dvh;overflow:auto}.aiDlg .db{padding:0 18px 18px}
+.aiSeg{display:flex;gap:6px;margin:0 0 10px}.aiSeg:empty{display:none}.aiSeg button{flex:1;border:1px solid var(--line);background:transparent;color:inherit;border-radius:999px;padding:8px;font:600 13px inherit;cursor:pointer}.aiSeg button[aria-pressed=true]{background:var(--wine);border-color:var(--wine);color:#fff}
+.aiStage{position:relative;border-radius:16px;overflow:hidden;background:#ebe3e5;touch-action:none;user-select:none;-webkit-user-select:none}.aiStage img{display:block;width:100%;max-height:58dvh;object-fit:contain;-webkit-touch-callout:none}
+.aiTag{position:absolute;left:10px;top:10px;background:#000a;color:#fff;font-size:12px;border-radius:999px;padding:5px 10px}.aiTag.ai{background:#65243be6}
+.aiHint{font-size:12.5px;margin:8px 0 0;text-align:center}.aiPriv{font-size:12px;margin:10px 0}.aiStatus{min-height:1.2em;margin:8px 0 0;font-size:13.5px}
 .stage{background:var(--rose);border-radius:16px;min-height:320px;display:grid;place-items:center;position:relative;overflow:hidden}
 .stage canvas.photo{display:block;max-width:100%;max-height:68vh;width:auto;height:auto;touch-action:none}
 .empty{text-align:center;padding:22px 16px;display:grid;justify-items:center;gap:8px;max-width:420px}
@@ -388,12 +393,12 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-cor14</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-ia16</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
       <div class="pick hidden" id="fchips" style="margin-top:8px"></div>
-      <div class="under" id="underBox" style="margin-top:8px"><span id="exp">As fotos ficam só no seu aparelho e somem em 24h. <span style="opacity:.7">Detecção de unhas: modelo nails_seg_yolov8 de mnemic (CC BY 4.0).</span></span><span class="sp"></span>
+      <div class="under" id="underBox" style="margin-top:8px"><span id="exp">No provador local, as fotos ficam no aparelho por até 24h. <span style="opacity:.7">Detecção de unhas: modelo nails_seg_yolov8 de mnemic (CC BY 4.0).</span></span><span class="sp"></span>
         <span id="swap" class="hidden"><label class="link"><input type="file" accept="image/*" capture="environment" class="pf2" hidden>Tirar outra</label><label class="link"><input type="file" accept="image/*" class="pf2" hidden>Trocar foto</label></span>
         <label class="link" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer"><button class="toggle" role="switch" id="bgTog" aria-label="Fundo neutro"></button>Fundo neutro</label><label class="link" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer"><button class="toggle" role="switch" id="alTog" aria-label="Alinhar ao modelo"></button>Alinhar ao modelo</label><button class="link" id="wipe">Apagar fotos</button><button class="wine hidden" id="nextBtn" style="min-height:40px">Agora a mão direita →</button>
       </div>
@@ -410,6 +415,7 @@ input[type=range]{width:100%;accent-color:#65243b}
         <div class="pick" style="justify-content:flex-start"><button class="ghost" id="editBtn">Ligar ajuste</button><button class="ghost hidden" id="delBtn">Remover</button></div>
         <div class="edit hidden" id="editCtl" style="margin-top:8px"><label>Tamanho<input type="range" id="rL" min="0.6" max="1.6" step="0.01" value="1"></label><label>Largura<input type="range" id="rW" min="0.6" max="1.6" step="0.01" value="1"></label><label>Giro<input type="range" id="rA" min="-45" max="45" step="1" value="0"></label></div>
       </details>
+      <button type="button" class="ghost hidden" id="aiPreviewBtn" style="width:100%;margin-bottom:10px">✨ Ver resultado realista com IA</button>
       <button class="wine" data-close style="width:100%">Concluir e ver o total</button>
     </div>
   </div>
@@ -513,8 +519,16 @@ function paintNail(out,src,n,i){
   const fz=n.flat?1-TW[q]:1,bright=fz*Math.max(0,Math.min(1,(l-mid)/Math.max(18,(high-mid)*1.35))),glint=fz*Math.max(0,Math.min(1,(l-mean-1)/Math.max(12,range*.46)));
   const off=u-(facing+.1*(t-.5)+.08*Math.sin(Math.PI*t)),broad=Math.exp(-.5*Math.pow(off/.34,2)),ridge=Math.exp(-.5*Math.pow(off/.105,2)),ext=Math.pow(Math.sin(Math.PI*t),.68);
   const gloss=mLight*ext*((.06+.058*bright)*broad+(.135+.115*bright)*ridge),d=DIST[q]||.5,refl=inten*(gloss+.08*Math.pow(bright,1.7)+.075*Math.pow(glint,1.8))*Math.min(1,d/soft);
+  // reflexo de janela: faixa nítida que acompanha a curvatura (é o que faz parecer esmalte de verdade)
+  const sm=(e0,e1,x)=>{const k2=Math.max(0,Math.min(1,(x-e0)/(e1-e0)));return k2*k2*(3-2*k2)};
+  const wOff=Math.abs(off+.02),win=(1-sm(.055,.11,wOff))*sm(.16,.3,t)*(1-sm(.7,.84,t))*(matte?0:gl?1:.5)*fz;
+  const hot=Math.exp(-(Math.pow((u-facing*.9)/.09,2)+Math.pow((t-.3)/.07,2)))*(matte?0:1)*fz;
+  // borda: a camada de esmalte tem espessura — escurece um fio na borda e acende o fio do lado da luz
+  const de=Math.min(1,d/(soft*2.2)),rimDark=1-.14*(1-de)*(1-de),rimLit=Math.exp(-d/(soft*.9))*Math.max(0,u*Math.sign(facing||-.3))*.18*(matte?.3:1);
+  const reflF=Math.min(.92,refl+(.34*win+.42*hot)*inten*mLight+rimLit);
   const ed=Math.min(1,(d+.2)/soft),ea=ed*ed*(3-2*ed);let a=Math.min(M[p+3]/255,DIST[q]?ea:M[p+3]/255)*.976;if(n.design==='franc'&&!(D[p]>225&&D[p+1]>215&&D[p+2]>210))a*=.6;
-  for(let c=0;c<3;c++){const pg=lin(D[p+c]/255),v=enc(Math.min(1,pg*shade*(1-refl)+refl));O.data[p+c]=S0[p+c]*(1-a)+v*a}}
+  const gr=(((x*73856093)^(y*19349663))>>>0)%1000/1000-.5;// grão da foto, para não parecer adesivo
+  for(let c=0;c<3;c++){const pg=lin(D[p+c]/255),v=enc(Math.min(1,pg*shade*rimDark*(1-reflF)+reflF))+gr*2.6;O.data[p+c]=S0[p+c]*(1-a)+v*a}}
  oc.putImageData(O,x0,y0);[m,d,rb,db,fb].forEach(c=>{try{if(c&&c.width){c.width=0;c.height=0}}catch(_){}})}
 function renderHand(h){if(!h)return null;const o=h.out||(h.out=document.createElement('canvas'));o.width=h.src.width;o.height=h.src.height;
  o.getContext('2d').drawImage(h.src,0,0);h.nails.forEach((n,i)=>{if(n.color)paintNail(o,h.src,n,i)});return o}
@@ -743,7 +757,7 @@ function openDB(){return new Promise(r=>{try{const q=indexedDB.open('lume-provad
 function dbPut(k,v){try{if(db)db.transaction('h','readwrite').objectStore('h').put(v,k)}catch(e){}}
 function dbDel(k){try{if(db)db.transaction('h','readwrite').objectStore('h').delete(k)}catch(e){}}
 function dbGet(k){return new Promise(r=>{try{const q=db.transaction('h').objectStore('h').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}})}
-function save(k){const h=S.hands[k];if(!h)return;dbPut(k,{img:h.jpg,ts:h.ts,lm:h.lm,mask:h.maskURL||null,nails:h.nails.map(({f,cx,cy,L,W,ang,cp,edited})=>({f,cx,cy,L,W,ang,cp:edited?cp:undefined,edited}))})}
+function save(k){const h=S.hands[k];if(!h)return;dbPut(k,{img:h.jpg,aiOriginal:h.aiOriginal,ts:h.ts,lm:h.lm,mask:h.maskURL||null,nails:h.nails.map(({f,cx,cy,L,W,ang,cp,edited})=>({f,cx,cy,L,W,ang,cp:edited?cp:undefined,edited}))})}
 let saveT=null;const saveSoon=k=>{clearTimeout(saveT);saveT=setTimeout(()=>save(k),400)};
 const DAY=864e5;
 async function takePhoto(src,k){status('Preparando a foto…');
@@ -751,7 +765,7 @@ async function takePhoto(src,k){status('Preparando a foto…');
   let c=toCanvas(im,1400);{const ex=exposureIssue(c);if(ex&&typeof src!=='string'){status(ex);await new Promise(r=>setTimeout(r,2600))}}const h={src:c,orig:c,jpg:c.toDataURL('image/jpeg',.85),ts:Date.now(),nails:[]};S.hands[k]=h;S.sel=null;S.view=k;S._zv=null;showT();status('Procurando as unhas…');
   let lm=(S.pose==='dobrada'&&typeof src!=='string')?null:await detect(toCanvas(im,960));let poseTip='';h.pose=S.pose;
   if(lm){h.lm=lm.map(p=>({x:p.x,y:p.y}));status('Recortando a mão (IA no aparelho)…');await new Promise(r=>setTimeout(r,30));try{h.mask=await handMaskMT(c,h.lm)}catch(_){h.mask=null}
-  if(S.align&&typeof src!=='string'){const A=alignToTemplate(c,lm,k,h.mask);if(A){c=A.canvas;lm=A.lm;h.lm=lm.map(p=>({x:p.x,y:p.y}));h.mask=A.mask;poseTip=A.tip;Object.assign(h,{src:c,orig:c,jpg:c.toDataURL('image/jpeg',.88)})}}
+  if(S.align&&typeof src!=='string'){const A=alignToTemplate(c,lm,k,h.mask);if(A){c=A.canvas;lm=A.lm;h.lm=lm.map(p=>({x:p.x,y:p.y}));h.mask=A.mask;poseTip=A.tip;h.aiOriginal=h.jpg;Object.assign(h,{src:c,orig:c,jpg:c.toDataURL('image/jpeg',.88)})}}
   const fwE=Math.hypot((lm[5].x-lm[9].x)*c.width,(lm[5].y-lm[9].y)*c.height)||20;try{h.bg=h.mask?composeNeutral(c,h.mask,fwE):neutralBg(c,h.lm)}catch(_){h.bg=null}try{h.maskURL=h.mask?h.mask.toDataURL('image/png'):null}catch(_){}h.src=S.bgOn&&h.bg?h.bg:c;h.nails=nailsFromLm(lm,c.width,c.height);status('Encontrando cada unha com IA…');h.yolo=await nailSeg(c,lm);if(h.yolo){status('Conferindo cada dedo…');h.yolo=await nailSegFill(c,h.nails,h.yolo)}status('Lendo o formato de cada unha…');await new Promise(r=>setTimeout(r,30));let fit=false;try{fit=fitFromMask(h)}catch(_){}if(!fit)try{anatomize(h)}catch(_){}if(!fit)h.nails.forEach(n=>delete n.cp);ensureCP(h);status(poseTip);if(poseTip)setTimeout(()=>status(''),6000)}else{status(S.pose==='dobrada'?'Encontrando cada unha com IA…':'Procurando as unhas direto na foto…');let ok=0;try{ok=await nailsWithoutHand(h,c)}catch(e){console.warn(e)}
    if(ok){status('');}else{status('Não achei as unhas sozinho. Abra "Ajustar marcação" e toque em cada unha.');$('#adj').open=true;setEdit(true);setTimeout(()=>status(''),5000)}}
   save(k);showT();return h.nails.length}catch(e){status('Não consegui abrir essa foto. Tente outra.');setTimeout(()=>status(''),4000);return 0}}
@@ -790,14 +804,14 @@ function drawT(){
  const h=S.hands[S.view];if(!h)return;styleHand(S.view);const o=renderHand(h),q=S.edit?{ox:0,oy:0,cw:o.width,ch:o.height}:handCrop(h,o);cv.width=q.cw;cv.height=q.ch;lay=[{k:S.view,x:0,s:1,w:q.cw,ox:q.ox,oy:q.oy}];
  const c=cv.getContext('2d');c.drawImage(o,q.ox,q.oy,q.cw,q.ch,0,0,q.cw,q.ch);const lw=Math.max(2,q.cw/320);c.save();c.translate(-q.ox,-q.oy);
  if(S.edit)h.nails.forEach((n,i)=>outline(c,n,S.sel&&S.sel.k===S.view&&S.sel.i===i,lw,FING[n.f]));else{const n=S.sel&&S.sel.k===S.view&&selNail();if(n)outline(c,n,true,lw)}c.restore()}
-function showT(){const v=S.view,both=S.hands.L&&S.hands.R,h=S.hands[v];$('#views').classList.toggle('hidden',!both);
+function showT(){$('#aiPreviewBtn').classList.toggle('hidden',!(window.NV_AI&&window.NV_AI.ok)||![S.hands.L,S.hands.R].some(h=>h&&Date.now()-h.ts<DAY));const v=S.view,both=S.hands.L&&S.hands.R,h=S.hands[v];$('#views').classList.toggle('hidden',!both);
  document.querySelectorAll('#views [data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
  const is3=v==='3',isB=v==='B',has=isB?(S.hands.L||S.hands.R):h;
  $('#empty').classList.toggle('hidden',!!has||is3);cv.classList.toggle('hidden',!has||is3);$('#zbar').classList.toggle('hidden',!has||is3);if(S._zv!==v){S._zv=v;try{zReset()}catch(_){}}$('#fig').classList.toggle('hidden',!is3);$('#fchips').classList.toggle('hidden',!is3);
  $('#swap').classList.toggle('hidden',!(h&&!isB&&!is3));$('#adj').classList.toggle('hidden',isB||is3||!h);$('#nextBtn').classList.toggle('hidden',!(v==='L'&&S.hands.L&&!S.hands.R));
  if(!has&&!is3){const L=v!=='R';$('#emptyT').textContent=L?'Mão esquerda':'Agora, a mão direita';$('#emptyP').textContent=L?'Posicione a mão igual ao modelo.':'Agora a direita, igual ao modelo. Depois eu junto as duas.';
   $('#exImg').src=L?'hand-example-left.webp':'hand-example-right.webp';$('#exGuide').src=L?'guide-left.png':'guide-right.png';poseUI(L);$('#st1').className=L?'on':'ok';$('#st1').textContent=L?'1':'✓';$('#st2').className=L?'':'on'}
- const ts=[S.hands.R,S.hands.L].filter(Boolean).map(x=>x.ts);$('#exp').textContent=ts.length?`Fotos só no seu aparelho · somem em ${Math.max(1,Math.ceil((Math.min(...ts)+DAY-Date.now())/36e5))}h`:'As fotos ficam só no seu aparelho e somem em 24h.';
+ const ts=[S.hands.R,S.hands.L].filter(Boolean).map(x=>x.ts);$('#exp').textContent=ts.length?`Provador local · fotos no aparelho por até ${Math.max(1,Math.ceil((Math.min(...ts)+DAY-Date.now())/36e5))}h`:'No provador local, as fotos ficam no aparelho por até 24h.';
  syncEdit();if(is3)start3D();else{stop3D();drawT()}}
 function brushSVG(hex,w=34,h=34){const c=esc(hex);return`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 34 34"><g transform="rotate(40 17 17)"><rect x="13" y="0.5" width="8" height="15" rx="3" fill="#2a1a20" stroke="#fff" stroke-width="1"/><rect x="15.2" y="15" width="3.6" height="6" fill="#c9a46a"/><path d="M14.6 20.5h4.8l-.4 8.6c-.2 2.4-1.2 4.2-2 4.4-.8-.2-1.8-2-2-4.4z" fill="${c}" stroke="#fff" stroke-width=".9"/></g></svg>`}
 function setCursor(){const hex=(byId(S.brushC)||{}).hex||'#731b35';cv.style.cursor=S.edit?'':`url("data:image/svg+xml,${encodeURIComponent(brushSVG(hex))}") 6 30, pointer`;$('#brushIco').innerHTML=brushSVG(hex,40,40)}
@@ -891,6 +905,20 @@ cv.addEventListener('dblclick',e=>e.preventDefault());
 /* tocar fora (fora da foto, das cores e das nail arts) tira a marcação: volta a pintar todas */
 document.addEventListener('pointerup',e=>{if(!S.sel||S.edit||!trDlg.open)return;const t=e.target;
  if(t.closest&&t.closest('#cv,#tDots,#tArts,#ptarget,.zbar,#adj,#editCtl,#views'))return;S.sel=null;renderTarget();drawT()},true);
+
+/* ---------- prévia realista com IA (opcional, só quando o servidor com a chave está ativo) ---------- */
+window.NV_AI={ok:false};
+fetch('./api/previa-realista/status',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.ok){window.NV_AI={ok:true,configured:!!j.configured};try{showT()}catch(_){}}}).catch(()=>{});
+function nailMaskPNG(h,grow){// máscara das unhas (transparente = editar), do tamanho da foto
+ const W=h.orig.width,H=h.orig.height,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const m=document.createElement('canvas');m.width=W;m.height=H;const mx=m.getContext('2d');h.nails.forEach(n=>{const P=n.pm;if(!P)return;const id=mx.createImageData(P.w,P.h);for(let q=0;q<P.a.length;q++){id.data[q*4+3]=P.a[q]>40?255:0}const t=document.createElement('canvas');t.width=P.w;t.height=P.h;t.getContext('2d').putImageData(id,0,0);mx.drawImage(t,P.x0,P.y0)});
+ const g=document.createElement('canvas');g.width=W;g.height=H;const gx=g.getContext('2d');gx.filter='blur('+grow+'px)';gx.drawImage(m,0,0);gx.filter='none';
+ const gd=gx.getImageData(0,0,W,H),d=gd.data;for(let q=3;q<d.length;q+=4)d[q]=d[q]>20?255:0;gx.putImageData(gd,0,0);
+ x.globalCompositeOperation='destination-out';x.drawImage(g,0,0);return{png:c.toDataURL('image/png'),mask:g}}
+$('#aiPreviewBtn').onclick=()=>window.NailVirtualPreview.open({side:S.view==='B'?(S.hands.L?'L':'R'):S.view,hands:S.hands,shape:S.shape,length:S.nlen,
+ local:k=>{const h=S.hands[k];styleHand(k);return renderHand(h)},
+ mask:(k,tight)=>nailMaskPNG(S.hands[k],tight?Math.max(1,Math.round(S.hands[k].orig.width/700)):Math.max(4,Math.round(S.hands[k].orig.width/180))),
+ style:k=>FING.map((_,i)=>{const pick=look[SIDE[k]+i],color=byId(pick.c),art=pick.a&&byId(pick.a);return{color:color?.hex||null,finish:color?.finish||'',art:art?.name||''}})});
 setTimeout(()=>{try{renderTarget()}catch(_){}},0);
 document.querySelectorAll('#fakeTog [data-t]').forEach(b=>b.onclick=()=>{S.shape=b.dataset.t==='fake'?(S.lastFake||'amendoada'):'natural';try{localStorage.setItem('lume-shape2',S.shape)}catch(_){}renderShapeChips();reshapeAll()});setTimeout(()=>{try{renderShapeChips()}catch(_){}},0);
 
@@ -1357,8 +1385,9 @@ $('#tipT').textContent=TIPS[new Date().getDate()%TIPS.length];
 $('#studioName').textContent=D.settings.name;
 renderFilt();renderGrid();renderSummary();go(location.hash.slice(1));
 openDB().then(async()=>{if(!db)return;for(const k of['R','L']){const v=await dbGet(k);if(!v)continue;if(Date.now()-v.ts>DAY){dbDel(k);continue}
- try{const im=await loadImg(v.img);{const oc=toCanvas(im,1400);S.hands[k]={src:oc,orig:oc,lm:v.lm,jpg:v.img,ts:v.ts,nails:v.nails||[],maskURL:v.mask};if(v.mask)try{const mi=await loadImg(v.mask),mc=document.createElement('canvas');mc.width=oc.width;mc.height=oc.height;mc.getContext('2d').drawImage(mi,0,0,oc.width,oc.height);S.hands[k].mask=mc}catch(_){}applyBg(S.hands[k]);{const hh=S.hands[k],ed=hh.nails.filter(n=>n.edited);if(hh.mask&&hh.lm){const rest={orig:hh.orig,mask:hh.mask,lm:hh.lm,nails:hh.nails.filter(n=>!n.edited)};try{rest.yolo=await nailSeg(hh.orig,hh.lm)}catch(_){}try{fitFromMask(rest)}catch(_){}}}}ensureCP(S.hands[k]);}catch(_){}}S.view=S.hands.L&&S.hands.R?'B':S.hands.L?'R':'L'});
+ try{const im=await loadImg(v.img);{const oc=toCanvas(im,1400);S.hands[k]={src:oc,orig:oc,lm:v.lm,jpg:v.img,aiOriginal:v.aiOriginal,ts:v.ts,nails:v.nails||[],maskURL:v.mask};if(v.mask)try{const mi=await loadImg(v.mask),mc=document.createElement('canvas');mc.width=oc.width;mc.height=oc.height;mc.getContext('2d').drawImage(mi,0,0,oc.width,oc.height);S.hands[k].mask=mc}catch(_){}applyBg(S.hands[k]);{const hh=S.hands[k],ed=hh.nails.filter(n=>n.edited);if(hh.mask&&hh.lm){const rest={orig:hh.orig,mask:hh.mask,lm:hh.lm,nails:hh.nails.filter(n=>!n.edited)};try{rest.yolo=await nailSeg(hh.orig,hh.lm)}catch(_){}try{fitFromMask(rest)}catch(_){}}}}ensureCP(S.hands[k]);}catch(_){}}S.view=S.hands.L&&S.hands.R?'B':S.hands.L?'R':'L'});
 }
 </script>
+<script src="preview-ia.js"></script>
 </body>
 </html>
