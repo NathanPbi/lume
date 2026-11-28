@@ -263,7 +263,9 @@ input[type=range]{width:100%;accent-color:#65243b}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 .vh{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}label:has(>.vh){position:relative}</style>
 </head>
-<body>
+<body><div id="nvDbg" style="position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 6px);z-index:2147483647;max-height:20vh;pointer-events:none;overflow:auto;background:rgba(20,10,14,.88);color:#f6e9ee;font:11px/1.35 ui-monospace,Menlo,monospace;padding:8px 10px;border-radius:10px;display:none;white-space:pre-wrap"><b style="color:#fff">Diagnóstico da foto</b> <span onclick="this.parentNode.style.display='none'" style="float:right;padding:0 8px;cursor:pointer;pointer-events:auto">✕</span><div id="nvDbgL"></div></div>
+<script>window.nvDbg=function(m){try{var b=document.getElementById('nvDbg'),l=document.getElementById('nvDbgL');if(!b)return;var dl=document.querySelector('dialog[open]');if(dl&&b.parentNode!==dl)dl.appendChild(b);b.style.display='block';var t=new Date(),d=document.createElement('div');d.textContent=('0'+t.getMinutes()).slice(-2)+':'+('0'+t.getSeconds()).slice(-2)+' '+m;l.appendChild(d);b.scrollTop=1e6}catch(_){}};window.addEventListener('error',function(e){nvDbg('ERRO JS: '+(e.message||e))});window.addEventListener('unhandledrejection',function(e){nvDbg('ERRO: '+((e.reason&&e.reason.message)||e.reason))});</script>
+
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
@@ -393,7 +395,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v28.11-gal19</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v28.11-gal20</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -763,9 +765,13 @@ const DAY=864e5;
 
 /* abre a foto da galeria com segurança no iPhone: fotos grandes (48 MP), HEIC e orientação */
 async function fileToImage(f){
- if(f.type&&!/^image\//.test(f.type))throw Error('tipo');
- if(window.createImageBitmap){try{const bm=await createImageBitmap(f,{imageOrientation:'from-image'});const s=Math.min(1,2000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);bm.close&&bm.close();return c}catch(_){}}
- const u=URL.createObjectURL(f);try{return await loadImg(u)}finally{setTimeout(()=>URL.revokeObjectURL(u),4000)}}
+ const D=window.nvDbg||(()=>{});
+ const tmo=(p,ms,n)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(Error(n+' demorou')),ms))]);
+ const fit=(src,w,h)=>{const s=Math.min(1,2000/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*s));c.height=Math.max(1,Math.round(h*s));c.getContext('2d').drawImage(src,0,0,c.width,c.height);return c};
+ const viaImg=async u=>{const im=await tmo(loadImg(u),15000,'img');const w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;if(!w||!h)throw Error('img vazia');return fit(im,w,h)};
+ try{const u=URL.createObjectURL(f);try{const c=await viaImg(u);D('abriu (modo 1) '+c.width+'x'+c.height);return c}finally{setTimeout(()=>URL.revokeObjectURL(u),4000)}}catch(e){D('modo 1 falhou: '+e.message)}
+ if(window.createImageBitmap){try{const bm=await tmo(createImageBitmap(f),15000,'bitmap');const c=fit(bm,bm.width,bm.height);bm.close&&bm.close();D('abriu (modo 2) '+c.width+'x'+c.height);return c}catch(e){D('modo 2 falhou: '+e.message)}}
+ try{const u=await tmo(new Promise((r,j)=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>j(fr.error||Error('leitura'));fr.readAsDataURL(f)}),20000,'leitura');const c=await viaImg(u);D('abriu (modo 3) '+c.width+'x'+c.height);return c}catch(e){D('modo 3 falhou: '+e.message);throw Error('formato não suportado')}}
 async function takePhoto(src,k){status('Preparando a foto…');
  try{const im=typeof src==='string'?await loadImg(src):await fileToImage(src);
   let c=toCanvas(im,1400);{const ex=exposureIssue(c);if(ex&&typeof src!=='string'){status(ex);await new Promise(r=>setTimeout(r,2600))}}const h={src:c,orig:c,jpg:c.toDataURL('image/jpeg',.85),ts:Date.now(),nails:[]};S.hands[k]=h;S.sel=null;S.view=k;S._zv=null;showT();status('Procurando as unhas…');
@@ -774,8 +780,8 @@ async function takePhoto(src,k){status('Preparando a foto…');
   if(S.align&&typeof src!=='string'){const A=alignToTemplate(c,lm,k,h.mask);if(A){c=A.canvas;lm=A.lm;h.lm=lm.map(p=>({x:p.x,y:p.y}));h.mask=A.mask;poseTip=A.tip;h.aiOriginal=h.jpg;Object.assign(h,{src:c,orig:c,jpg:c.toDataURL('image/jpeg',.88)})}}
   const fwE=Math.hypot((lm[5].x-lm[9].x)*c.width,(lm[5].y-lm[9].y)*c.height)||20;try{h.bg=h.mask?composeNeutral(c,h.mask,fwE):neutralBg(c,h.lm)}catch(_){h.bg=null}try{h.maskURL=h.mask?h.mask.toDataURL('image/png'):null}catch(_){}h.src=S.bgOn&&h.bg?h.bg:c;h.nails=nailsFromLm(lm,c.width,c.height);status('Encontrando cada unha com IA…');h.yolo=await nailSeg(c,lm);if(h.yolo){status('Conferindo cada dedo…');h.yolo=await nailSegFill(c,h.nails,h.yolo)}status('Lendo o formato de cada unha…');await new Promise(r=>setTimeout(r,30));let fit=false;try{fit=fitFromMask(h)}catch(_){}if(!fit)try{anatomize(h)}catch(_){}if(!fit)h.nails.forEach(n=>delete n.cp);ensureCP(h);status(poseTip);if(poseTip)setTimeout(()=>status(''),6000)}else{status(S.pose==='dobrada'?'Encontrando cada unha com IA…':'Procurando as unhas direto na foto…');let ok=0;try{ok=await nailsWithoutHand(h,c)}catch(e){console.warn(e)}
    if(ok){status('');}else{status('Não achei as unhas sozinho. Abra "Ajustar marcação" e toque em cada unha.');$('#adj').open=true;setEdit(true);setTimeout(()=>status(''),5000)}}
-  save(k);showT();return h.nails.length}catch(e){console.warn(e);const d=String(e&&(e.message||e.name)||e).slice(0,60);status('Não consegui abrir essa foto ('+d+'). Tente outra, ou tire a foto pelo app.');setTimeout(()=>status(''),9000);return 0}}
-async function onPhoto(src,k){const n=await takePhoto(src,k);if(!n)return;
+  save(k);showT();return h.nails.length}catch(e){console.warn(e);window.nvDbg&&nvDbg('falhou: '+(e&&e.message||e));const d=String(e&&(e.message||e.name)||e).slice(0,60);status('Não consegui abrir essa foto ('+d+'). Tente outra, ou tire a foto pelo app.');setTimeout(()=>status(''),9000);return 0}}
+async function onPhoto(src,k){(window.nvDbg&&typeof src!=='string')&&nvDbg('processando mão '+k+'…');const n=await takePhoto(src,k);(window.nvDbg&&typeof src!=='string')&&nvDbg('resultado: '+n+' unhas; tela='+S.view);if(!n)return;
  if(k==='L'&&!S.hands.R)setTimeout(()=>{if(S.view==='L'&&!S.hands.R){S.view='R';showT()}},1300);else if(S.hands.L&&S.hands.R)setTimeout(()=>{S.view='B';showT()},900)}
 function selNail(){if(!S.sel)return null;const h=S.hands[S.sel.k];return h&&h.nails[S.sel.i]||null}
 function setEdit(on){S.edit=on;setTimeout(()=>typeof setCursor==='function'&&setCursor());$('#editBtn').textContent=on?'Concluir ajuste':'Ligar ajuste';if(!on)S.sel=null;syncEdit();drawT()}
@@ -945,7 +951,7 @@ $('#delBtn').onclick=()=>{const h=S.sel&&S.hands[S.sel.k];if(h){h.nails.splice(S
 $('#editBtn').onclick=()=>setEdit(!S.edit);
 document.querySelectorAll('#views [data-v]').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;S.sel=null;if(S.edit&&(S.view==='B'||S.view==='3'))setEdit(false);showT()});
 $('#nextBtn').onclick=()=>{S.view='R';S.edit=false;S.sel=null;showT()};
-const pfGot=(e,k)=>{const i=e.target,f=i.files&&i.files[0];if(!f){return}if(i._busy===f)return;i._busy=f;const mb=(f.size/1048576).toFixed(1);try{toast('Foto recebida ('+(f.type||'formato desconhecido')+', '+mb+' MB). Analisando…')}catch(_){}setTimeout(()=>{i.value='';i._busy=null},1500);onPhoto(f,k||(S.view==='R'?'R':'L'))};
+const pfGot=(e,k)=>{const i=e.target,f=i.files&&i.files[0];(window.nvDbg||(()=>{}))('evento '+e.type+': '+(f?(f.name+' | '+(f.type||'sem tipo')+' | '+(f.size/1048576).toFixed(1)+' MB'):'nenhum arquivo'));if(!f){return}if(i._busy===f)return;i._busy=f;const mb=(f.size/1048576).toFixed(1);try{toast('Foto recebida ('+(f.type||'formato desconhecido')+', '+mb+' MB). Analisando…')}catch(_){}setTimeout(()=>{i.value='';i._busy=null},1500);onPhoto(f,k||(S.view==='R'?'R':'L'))};
 document.querySelectorAll('.pf').forEach(i=>{i.addEventListener('change',e=>pfGot(e));i.addEventListener('input',e=>pfGot(e))});
 document.querySelectorAll('.pf2').forEach(i=>{const h=e=>pfGot(e,e.target.dataset.k||(S.view==='R'?'R':'L'));i.addEventListener('change',h);i.addEventListener('input',h)});
 $('#useEx').onclick=()=>{const k=S.view==='R'?'R':'L';onPhoto(k==='L'?'hand-example-left.webp':'hand-example-right.webp',k)};
