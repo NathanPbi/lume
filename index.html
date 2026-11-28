@@ -261,7 +261,7 @@ details summary{cursor:pointer;min-height:36px;display:flex;align-items:center;f
 input[type=range]{width:100%;accent-color:#65243b}
 .hidden{display:none!important}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+.vh{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}label:has(>.vh){position:relative}</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -387,19 +387,19 @@ input[type=range]{width:100%;accent-color:#65243b}
           <h3 id="emptyT">Mão esquerda</h3>
           <p class="muted" id="emptyP">Posicione a mão igual ao modelo.</p><ul class="tipList" id="tipList"><li>Costas da mão para cima, unhas viradas para a câmera</li><li>Dedos abertos como no contorno, polegar para o lado</li><li>Celular reto, a uns 25 cm da mão</li><li>Boa luz, sem flash</li></ul>
           <div class="pick">
-            <button class="wine" id="camBtn"><svg class="i"><use href="#i-cam"/></svg>Tirar foto com guia</button><input type="file" accept="image/*" capture="environment" class="pf" id="pfCam" hidden>
-            <label class="ghost"><input type="file" accept="image/*" class="pf" hidden><svg class="i"><use href="#i-img"/></svg>Da galeria</label>
+            <button class="wine" id="camBtn"><svg class="i"><use href="#i-cam"/></svg>Tirar foto com guia</button><input type="file" accept="image/*" capture="environment" class="vh pf" id="pfCam">
+            <label class="ghost"><input type="file" accept="image/*" class="vh pf"><svg class="i"><use href="#i-img"/></svg>Da galeria</label>
           </div>
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v27.11-gal17</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v28.11-gal19</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
       <div class="pick hidden" id="fchips" style="margin-top:8px"></div>
       <div class="under" id="underBox" style="margin-top:8px"><span id="exp">No provador local, as fotos ficam no aparelho por até 24h. <span style="opacity:.7">Detecção de unhas: modelo nails_seg_yolov8 de mnemic (CC BY 4.0).</span></span><span class="sp"></span>
-        <span id="swap" class="hidden"><label class="link"><input type="file" accept="image/*" capture="environment" class="pf2" hidden>Tirar outra</label><label class="link"><input type="file" accept="image/*" class="pf2" hidden>Trocar foto</label></span>
+        <span id="swap" class="hidden"><label class="link swOne"><input type="file" accept="image/*" capture="environment" class="vh pf2">Tirar outra</label><label class="link swOne"><input type="file" accept="image/*" class="vh pf2">Trocar pela galeria</label><label class="link swB"><input type="file" accept="image/*" class="vh pf2" data-k="L">Trocar a esquerda</label><label class="link swB"><input type="file" accept="image/*" class="vh pf2" data-k="R">Trocar a direita</label></span>
         <label class="link" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer"><button class="toggle" role="switch" id="bgTog" aria-label="Fundo neutro"></button>Fundo neutro</label><label class="link" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer"><button class="toggle" role="switch" id="alTog" aria-label="Alinhar ao modelo"></button>Alinhar ao modelo</label><button class="link" id="wipe">Apagar fotos</button><button class="wine hidden" id="nextBtn" style="min-height:40px">Agora a mão direita →</button>
       </div>
     </div>
@@ -774,7 +774,7 @@ async function takePhoto(src,k){status('Preparando a foto…');
   if(S.align&&typeof src!=='string'){const A=alignToTemplate(c,lm,k,h.mask);if(A){c=A.canvas;lm=A.lm;h.lm=lm.map(p=>({x:p.x,y:p.y}));h.mask=A.mask;poseTip=A.tip;h.aiOriginal=h.jpg;Object.assign(h,{src:c,orig:c,jpg:c.toDataURL('image/jpeg',.88)})}}
   const fwE=Math.hypot((lm[5].x-lm[9].x)*c.width,(lm[5].y-lm[9].y)*c.height)||20;try{h.bg=h.mask?composeNeutral(c,h.mask,fwE):neutralBg(c,h.lm)}catch(_){h.bg=null}try{h.maskURL=h.mask?h.mask.toDataURL('image/png'):null}catch(_){}h.src=S.bgOn&&h.bg?h.bg:c;h.nails=nailsFromLm(lm,c.width,c.height);status('Encontrando cada unha com IA…');h.yolo=await nailSeg(c,lm);if(h.yolo){status('Conferindo cada dedo…');h.yolo=await nailSegFill(c,h.nails,h.yolo)}status('Lendo o formato de cada unha…');await new Promise(r=>setTimeout(r,30));let fit=false;try{fit=fitFromMask(h)}catch(_){}if(!fit)try{anatomize(h)}catch(_){}if(!fit)h.nails.forEach(n=>delete n.cp);ensureCP(h);status(poseTip);if(poseTip)setTimeout(()=>status(''),6000)}else{status(S.pose==='dobrada'?'Encontrando cada unha com IA…':'Procurando as unhas direto na foto…');let ok=0;try{ok=await nailsWithoutHand(h,c)}catch(e){console.warn(e)}
    if(ok){status('');}else{status('Não achei as unhas sozinho. Abra "Ajustar marcação" e toque em cada unha.');$('#adj').open=true;setEdit(true);setTimeout(()=>status(''),5000)}}
-  save(k);showT();return h.nails.length}catch(e){status('Não consegui abrir essa foto. Tente outra, ou tire a foto pelo app.');setTimeout(()=>status(''),5000);return 0}}
+  save(k);showT();return h.nails.length}catch(e){console.warn(e);const d=String(e&&(e.message||e.name)||e).slice(0,60);status('Não consegui abrir essa foto ('+d+'). Tente outra, ou tire a foto pelo app.');setTimeout(()=>status(''),9000);return 0}}
 async function onPhoto(src,k){const n=await takePhoto(src,k);if(!n)return;
  if(k==='L'&&!S.hands.R)setTimeout(()=>{if(S.view==='L'&&!S.hands.R){S.view='R';showT()}},1300);else if(S.hands.L&&S.hands.R)setTimeout(()=>{S.view='B';showT()},900)}
 function selNail(){if(!S.sel)return null;const h=S.hands[S.sel.k];return h&&h.nails[S.sel.i]||null}
@@ -814,7 +814,7 @@ function showT(){$('#aiPreviewBtn').classList.toggle('hidden',!(window.NV_AI&&wi
  document.querySelectorAll('#views [data-v]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
  const is3=v==='3',isB=v==='B',has=isB?(S.hands.L||S.hands.R):h;
  $('#empty').classList.toggle('hidden',!!has||is3);cv.classList.toggle('hidden',!has||is3);$('#zbar').classList.toggle('hidden',!has||is3);if(S._zv!==v){S._zv=v;try{zReset()}catch(_){}}$('#fig').classList.toggle('hidden',!is3);$('#fchips').classList.toggle('hidden',!is3);
- $('#swap').classList.toggle('hidden',!(h&&!isB&&!is3));$('#adj').classList.toggle('hidden',isB||is3||!h);$('#nextBtn').classList.toggle('hidden',!(v==='L'&&S.hands.L&&!S.hands.R));
+ $('#swap').classList.toggle('hidden',!((h&&!isB&&!is3)||(isB&&(S.hands.L||S.hands.R))));document.querySelectorAll('#swap .swOne').forEach(e=>e.style.display=isB?'none':'');document.querySelectorAll('#swap .swB').forEach(e=>e.style.display=isB?'':'none');$('#adj').classList.toggle('hidden',isB||is3||!h);$('#nextBtn').classList.toggle('hidden',!(v==='L'&&S.hands.L&&!S.hands.R));
  if(!has&&!is3){const L=v!=='R';$('#emptyT').textContent=L?'Mão esquerda':'Agora, a mão direita';$('#emptyP').textContent=L?'Posicione a mão igual ao modelo.':'Agora a direita, igual ao modelo. Depois eu junto as duas.';
   $('#exImg').src=L?'hand-example-left.webp':'hand-example-right.webp';$('#exGuide').src=L?'guide-left.png':'guide-right.png';poseUI(L);$('#st1').className=L?'on':'ok';$('#st1').textContent=L?'1':'✓';$('#st2').className=L?'':'on'}
  const ts=[S.hands.R,S.hands.L].filter(Boolean).map(x=>x.ts);$('#exp').textContent=ts.length?`Provador local · fotos no aparelho por até ${Math.max(1,Math.ceil((Math.min(...ts)+DAY-Date.now())/36e5))}h`:'No provador local, as fotos ficam no aparelho por até 24h.';
@@ -945,8 +945,9 @@ $('#delBtn').onclick=()=>{const h=S.sel&&S.hands[S.sel.k];if(h){h.nails.splice(S
 $('#editBtn').onclick=()=>setEdit(!S.edit);
 document.querySelectorAll('#views [data-v]').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;S.sel=null;if(S.edit&&(S.view==='B'||S.view==='3'))setEdit(false);showT()});
 $('#nextBtn').onclick=()=>{S.view='R';S.edit=false;S.sel=null;showT()};
-document.querySelectorAll('.pf').forEach(i=>i.onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)onPhoto(f,S.view==='R'?'R':'L')});
-document.querySelectorAll('.pf2').forEach(i=>i.onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)onPhoto(f,S.view)});
+const pfGot=(e,k)=>{const i=e.target,f=i.files&&i.files[0];if(!f){return}if(i._busy===f)return;i._busy=f;const mb=(f.size/1048576).toFixed(1);try{toast('Foto recebida ('+(f.type||'formato desconhecido')+', '+mb+' MB). Analisando…')}catch(_){}setTimeout(()=>{i.value='';i._busy=null},1500);onPhoto(f,k||(S.view==='R'?'R':'L'))};
+document.querySelectorAll('.pf').forEach(i=>{i.addEventListener('change',e=>pfGot(e));i.addEventListener('input',e=>pfGot(e))});
+document.querySelectorAll('.pf2').forEach(i=>{const h=e=>pfGot(e,e.target.dataset.k||(S.view==='R'?'R':'L'));i.addEventListener('change',h);i.addEventListener('input',h)});
 $('#useEx').onclick=()=>{const k=S.view==='R'?'R':'L';onPhoto(k==='L'?'hand-example-left.webp':'hand-example-right.webp',k)};
 
 /* ---------- mão no padrão do painel: alinha a foto ao modelo e guia a pessoa ---------- */
