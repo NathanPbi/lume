@@ -264,7 +264,7 @@ input[type=range]{width:100%;accent-color:#65243b}
 .vh{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}label:has(>.vh){position:relative}</style>
 </head>
 <body><div id="nvDbg" style="position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 6px);z-index:2147483647;max-height:20vh;pointer-events:none;overflow:auto;background:rgba(20,10,14,.88);color:#f6e9ee;font:11px/1.35 ui-monospace,Menlo,monospace;padding:8px 10px;border-radius:10px;display:none;white-space:pre-wrap"><b style="color:#fff">Diagnóstico da foto</b> <span onclick="this.parentNode.style.display='none'" style="float:right;padding:0 8px;cursor:pointer;pointer-events:auto">✕</span><div id="nvDbgL"></div></div>
-<script>window.nvDbg=function(m){try{var b=document.getElementById('nvDbg'),l=document.getElementById('nvDbgL');if(!b)return;var dl=document.querySelector('dialog[open]');if(dl&&b.parentNode!==dl)dl.appendChild(b);b.style.display='block';var t=new Date(),d=document.createElement('div');d.textContent=('0'+t.getMinutes()).slice(-2)+':'+('0'+t.getSeconds()).slice(-2)+' '+m;l.appendChild(d);b.scrollTop=1e6}catch(_){}};window.addEventListener('error',function(e){nvDbg('ERRO JS: '+(e.message||e))});window.addEventListener('unhandledrejection',function(e){nvDbg('ERRO: '+((e.reason&&e.reason.message)||e.reason))});</script>
+<script>window.nvDbg=function(m){try{var b=document.getElementById('nvDbg'),l=document.getElementById('nvDbgL');if(!b)return;var dl=document.querySelector('dialog[open]')||document.body;if(b.parentNode!==dl)dl.appendChild(b);b.style.display='block';var t=new Date(),d=document.createElement('div');d.textContent=('0'+t.getMinutes()).slice(-2)+':'+('0'+t.getSeconds()).slice(-2)+' '+m;l.appendChild(d);b.scrollTop=1e6}catch(_){}};window.addEventListener('error',function(e){nvDbg('ERRO JS: '+(e.message||e))});window.addEventListener('unhandledrejection',function(e){nvDbg('ERRO: '+((e.reason&&e.reason.message)||e.reason))});</script>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
@@ -395,7 +395,7 @@ input[type=range]{width:100%;accent-color:#65243b}
           <button class="link" id="useEx">Usar a mão padrão</button>
         </div>
         <canvas class="photo hidden" id="cv"></canvas>
-        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v28.11-gal20</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
+        <small style="position:absolute;left:8px;bottom:6px;font-size:10px;opacity:.45;z-index:2;pointer-events:none">v28.11-gal21</small><div class="zbar hidden" id="zbar" role="group" aria-label="Zoom"><button id="zOut" aria-label="Diminuir zoom">−</button><span id="zLvl">100%</span><button id="zIn" aria-label="Aumentar zoom">+</button><button id="zReset" class="zfit" disabled>Ajustar</button></div>
         <div class="fig hidden" id="fig"></div>
         <div class="status" id="status"></div>
       </div>
@@ -644,7 +644,7 @@ let toastT;function toast(t){const e=$('#toast');e.innerHTML='<svg class="i"><us
 /* ---------- diálogo genérico ---------- */
 const dlg=$('#dlg');
 function openDlg(title,html,bind){$('#dlgT').textContent=title;$('#dlgB').innerHTML=html;bind&&bind($('#dlgB'));if(!dlg.open)dlg.showModal()}
-document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-close]'))d.close()})});
+window._pickT=0;document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('label')&&e.target.closest('label').querySelector('input[type=file]'))window._pickT=Date.now()},true);document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target.closest('[data-close]')){d.close();return}if(e.target===d&&d.id!=='tryon'&&Date.now()-window._pickT>4000)d.close()})});
 
 /* catálogo: escolher */
 $('#catSeg').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;S.cat=b.dataset.k;$('#catSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderFilt();renderGrid()};
@@ -951,7 +951,7 @@ $('#delBtn').onclick=()=>{const h=S.sel&&S.hands[S.sel.k];if(h){h.nails.splice(S
 $('#editBtn').onclick=()=>setEdit(!S.edit);
 document.querySelectorAll('#views [data-v]').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;S.sel=null;if(S.edit&&(S.view==='B'||S.view==='3'))setEdit(false);showT()});
 $('#nextBtn').onclick=()=>{S.view='R';S.edit=false;S.sel=null;showT()};
-const pfGot=(e,k)=>{const i=e.target,f=i.files&&i.files[0];(window.nvDbg||(()=>{}))('evento '+e.type+': '+(f?(f.name+' | '+(f.type||'sem tipo')+' | '+(f.size/1048576).toFixed(1)+' MB'):'nenhum arquivo'));if(!f){return}if(i._busy===f)return;i._busy=f;const mb=(f.size/1048576).toFixed(1);try{toast('Foto recebida ('+(f.type||'formato desconhecido')+', '+mb+' MB). Analisando…')}catch(_){}setTimeout(()=>{i.value='';i._busy=null},1500);onPhoto(f,k||(S.view==='R'?'R':'L'))};
+const pfGot=(e,k)=>{const i=e.target,f=i.files&&i.files[0];(window.nvDbg||(()=>{}))('evento '+e.type+': '+(f?(f.name+' | '+(f.type||'sem tipo')+' | '+(f.size/1048576).toFixed(1)+' MB'):'nenhum arquivo'));if(!f){return}if(i._busy===f)return;i._busy=f;try{const td=document.getElementById('tryon');if(td&&!td.open){td.showModal();(window.nvDbg||(()=>{}))('provador estava fechado: reabri')}}catch(_){}const mb=(f.size/1048576).toFixed(1);try{toast('Foto recebida ('+(f.type||'formato desconhecido')+', '+mb+' MB). Analisando…')}catch(_){}setTimeout(()=>{i.value='';i._busy=null},1500);onPhoto(f,k||(S.view==='R'?'R':'L'))};
 document.querySelectorAll('.pf').forEach(i=>{i.addEventListener('change',e=>pfGot(e));i.addEventListener('input',e=>pfGot(e))});
 document.querySelectorAll('.pf2').forEach(i=>{const h=e=>pfGot(e,e.target.dataset.k||(S.view==='R'?'R':'L'));i.addEventListener('change',h);i.addEventListener('input',h)});
 $('#useEx').onclick=()=>{const k=S.view==='R'?'R':'L';onPhoto(k==='L'?'hand-example-left.webp':'hand-example-right.webp',k)};
